@@ -10,6 +10,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { Address } from 'src/address/entities/address.entity'
 import { User } from 'src/common/entities'
+import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends User {
@@ -39,4 +40,7 @@ export class Doctor extends User {
   @OneToOne(() => Address, (address) => address.doctor)
   @JoinColumn()
   address: Address
+
+  @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
+  hospitalDoctors: HospitalDoctors
 }
