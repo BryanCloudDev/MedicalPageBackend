@@ -6,12 +6,13 @@ import {
   OneToMany,
   OneToOne
 } from 'typeorm'
+import { SponsorLevel } from 'src/sponsor-level/entities/sponsor-level.entity'
+import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { Address } from 'src/address/entities/address.entity'
-import { User } from 'src/common/entities'
-import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 import { Review } from 'src/reviews/entities/review.entity'
+import { User } from 'src/common/entities'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends User {
@@ -47,4 +48,8 @@ export class Doctor extends User {
 
   @OneToMany(() => Review, (review) => review.doctor)
   reviews?: Review[]
+
+  @OneToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor)
+  @JoinColumn()
+  sponsorLevel: SponsorLevel
 }
