@@ -5,6 +5,7 @@ import { CommonModule } from './common/common.module'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { envConfiguration } from './config/env.config'
+import { DoctorsModule } from './doctors/doctors.module'
 
 @Module({
   imports: [
@@ -18,9 +19,11 @@ import { envConfiguration } from './config/env.config'
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      autoLoadEntities: true,
       synchronize: true
     }),
-    CommonModule
+    CommonModule,
+    DoctorsModule
   ],
   controllers: [AppController],
   providers: [AppService]
