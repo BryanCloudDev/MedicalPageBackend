@@ -2,6 +2,7 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
 import { Hospital } from 'src/hospital/entities/hospital.entity'
+import { Clinic } from 'src/clinic/entities/clinic.entity'
 
 @Entity({ name: 'addresses' })
 export class Address {
@@ -22,4 +23,7 @@ export class Address {
 
   @OneToOne(() => Hospital, (hospital) => hospital.address)
   hospital: Hospital
+
+  @OneToOne(() => Clinic, (clinic) => clinic.address)
+  clinic: Clinic
 }
