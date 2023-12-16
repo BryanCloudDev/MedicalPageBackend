@@ -1,5 +1,6 @@
+import { Column, Entity, OneToMany } from 'typeorm'
+import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { User } from 'src/common/entities'
-import { Column, Entity } from 'typeorm'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends User {
@@ -19,4 +20,7 @@ export class Doctor extends User {
 
   @Column('varchar', { nullable: true })
   startDateSponsor?: string
+
+  @OneToMany(() => Appointment, (appointment) => appointment.doctor)
+  appointments?: Appointment[]
 }

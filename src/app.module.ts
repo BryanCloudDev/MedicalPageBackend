@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { envConfiguration } from './config/env.config'
 import { DoctorsModule } from './doctors/doctors.module'
 import { PatientModule } from './patient/patient.module'
+import { AppointmentModule } from './appointment/appointment.module'
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { PatientModule } from './patient/patient.module'
     }),
     CommonModule,
     DoctorsModule,
-    PatientModule
+    PatientModule,
+    AppointmentModule
   ],
   controllers: [AppController],
   providers: [AppService]
