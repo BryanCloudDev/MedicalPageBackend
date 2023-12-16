@@ -12,6 +12,7 @@ import { SpecialtyModule } from './specialty/specialty.module'
 import { AddressModule } from './address/address.module'
 import { HospitalModule } from './hospital/hospital.module'
 import { ClinicModule } from './clinic/clinic.module'
+import { ReviewsModule } from './reviews/reviews.module'
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { ClinicModule } from './clinic/clinic.module'
     SpecialtyModule,
     AddressModule,
     HospitalModule,
-    ClinicModule
+    ClinicModule,
+    ReviewsModule
   ],
   controllers: [AppController],
   providers: [AppService]
