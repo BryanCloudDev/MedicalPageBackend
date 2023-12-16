@@ -19,10 +19,10 @@ export class User {
   @Column('varchar')
   password: string
 
-  @Column('varchar')
-  mobilePhone: string
+  @Column('varchar', { nullable: true })
+  mobilePhone?: string
 
-  @Column('varchar')
+  @Column('varchar', { default: 'https://imgur.com/1Vr5Zsj' })
   photo: string
 
   @Column('varchar')
