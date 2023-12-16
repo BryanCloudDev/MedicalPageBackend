@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Address } from './entities/address.entity'
 import { Country } from './entities/country.entity'
 import { State } from './entities/state.entity'
+import { City } from './entities/city.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Address, Country, State])],
+  imports: [TypeOrmModule.forFeature([Address, Country, State, City])],
   controllers: [AddressController],
   providers: [AddressService]
 })
