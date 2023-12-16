@@ -11,6 +11,7 @@ import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { Address } from 'src/address/entities/address.entity'
 import { User } from 'src/common/entities'
 import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
+import { Review } from 'src/reviews/entities/review.entity'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends User {
@@ -43,4 +44,7 @@ export class Doctor extends User {
 
   @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
   hospitalDoctors: HospitalDoctors
+
+  @OneToMany(() => Review, (review) => review.doctor)
+  reviews?: Review[]
 }

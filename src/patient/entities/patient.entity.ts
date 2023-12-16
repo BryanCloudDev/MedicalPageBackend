@@ -2,6 +2,7 @@ import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { Address } from 'src/address/entities/address.entity'
 import { User } from 'src/common/entities'
+import { Review } from 'src/reviews/entities/review.entity'
 
 @Entity({ name: 'patients' })
 export class Patient extends User {
@@ -11,4 +12,7 @@ export class Patient extends User {
   @OneToOne(() => Address, (address) => address.doctor)
   @JoinColumn()
   address: Address
+
+  @OneToMany(() => Review, (review) => review.patient)
+  reviews?: Review[]
 }
