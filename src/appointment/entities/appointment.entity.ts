@@ -7,8 +7,11 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column()
+  @Column('varchar')
   date: number
+
+  @Column('text')
+  result: string
 
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments)
   doctor: Doctor
