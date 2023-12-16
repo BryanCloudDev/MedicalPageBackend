@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany } from 'typeorm'
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
+import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { User } from 'src/common/entities'
 
 @Entity({ name: 'doctors' })
@@ -23,4 +24,7 @@ export class Doctor extends User {
 
   @OneToMany(() => Appointment, (appointment) => appointment.doctor)
   appointments?: Appointment[]
+
+  @ManyToOne(() => Specialty, (specialty) => specialty.doctors)
+  specialty: Specialty
 }

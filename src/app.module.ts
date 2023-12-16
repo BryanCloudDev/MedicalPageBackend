@@ -8,6 +8,7 @@ import { envConfiguration } from './config/env.config'
 import { DoctorsModule } from './doctors/doctors.module'
 import { PatientModule } from './patient/patient.module'
 import { AppointmentModule } from './appointment/appointment.module'
+import { SpecialtyModule } from './specialty/specialty.module'
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { AppointmentModule } from './appointment/appointment.module'
     CommonModule,
     DoctorsModule,
     PatientModule,
-    AppointmentModule
+    AppointmentModule,
+    SpecialtyModule
   ],
   controllers: [AppController],
   providers: [AppService]
