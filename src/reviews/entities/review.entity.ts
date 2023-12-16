@@ -2,7 +2,7 @@ import { Doctor } from 'src/doctors/entities/doctor.entity'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity()
+@Entity({ name: 'reviews' })
 export class Review {
   @PrimaryGeneratedColumn()
   id: number
