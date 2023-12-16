@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToOne, OneToOne } from 'typeorm'
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { BaseEntity } from 'src/common/entities'
 import { Address } from 'src/address/entities/address.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
+import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 
 @Entity({ name: 'clinics' })
 export class Clinic extends BaseEntity {
@@ -13,4 +14,7 @@ export class Clinic extends BaseEntity {
 
   @ManyToOne(() => Specialty, (specialty) => specialty.clinics)
   specialty: Specialty
+
+  @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
+  hospitalDoctors: HospitalDoctors
 }
