@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { envConfiguration } from './config/env.config'
 import { DoctorsModule } from './doctors/doctors.module'
+import { PatientModule } from './patient/patient.module'
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { DoctorsModule } from './doctors/doctors.module'
       synchronize: true
     }),
     CommonModule,
-    DoctorsModule
+    DoctorsModule,
+    PatientModule
   ],
   controllers: [AppController],
   providers: [AppService]
