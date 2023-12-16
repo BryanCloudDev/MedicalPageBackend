@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, OneToMany } from 'typeorm'
-import { BaseEntity } from './baseEntity.entity'
+import { BaseEntity } from 'src/common/entities'
 import { Country } from './country.entity'
 import { City } from './city.entity'
 

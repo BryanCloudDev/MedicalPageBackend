@@ -1,5 +1,5 @@
 import { Entity, ManyToOne } from 'typeorm'
-import { BaseEntity } from './baseEntity.entity'
+import { BaseEntity } from 'src/common/entities'
 import { State } from './state.entity'
 
 @Entity({ name: 'cities' })
