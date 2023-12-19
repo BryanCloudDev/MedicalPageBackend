@@ -1,13 +1,13 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
-import { BaseEntity } from 'src/common/entities'
-import { Address } from 'src/address/entities/address.entity'
+import { Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
-import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
+import { Address } from 'src/address/entities/address.entity'
+import { ClinicDoctor } from './clinicDoctor.entity'
+import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'clinics' })
 export class Clinic extends BaseEntity {
-  @Column('float')
-  distance: number
+  // @Column('float')
+  // distance: number
 
   @OneToOne(() => Address, (address) => address.clinic)
   address: Address
@@ -15,6 +15,6 @@ export class Clinic extends BaseEntity {
   @ManyToOne(() => Specialty, (specialty) => specialty.clinics)
   specialty: Specialty
 
-  @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
-  hospitalDoctors: HospitalDoctors
+  @OneToMany(() => ClinicDoctor, (clinicDoctors) => clinicDoctors.doctor)
+  clinicDoctors: ClinicDoctor[]
 }

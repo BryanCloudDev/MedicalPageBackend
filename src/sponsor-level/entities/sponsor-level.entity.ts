@@ -1,6 +1,6 @@
-import { Column, Entity, OneToOne } from 'typeorm'
-import { BaseEntity } from 'src/common/entities'
+import { Column, Entity, OneToMany } from 'typeorm'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'sponsor_levels' })
 export class SponsorLevel extends BaseEntity {
@@ -13,6 +13,6 @@ export class SponsorLevel extends BaseEntity {
   @Column('text')
   description: string
 
-  @OneToOne(() => Doctor, (dcotor) => dcotor.sponsorLevel)
-  doctor: Doctor
+  @OneToMany(() => Doctor, (doctor) => doctor.sponsorLevel)
+  doctor: Doctor[]
 }
