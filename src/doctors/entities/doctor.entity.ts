@@ -44,12 +44,11 @@ export class Doctor extends User {
   address: Address
 
   @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
-  hospitalDoctors: HospitalDoctors
+  hospitalDoctors: HospitalDoctors[]
 
   @OneToMany(() => Review, (review) => review.doctor)
   reviews?: Review[]
 
-  @OneToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor)
-  @JoinColumn()
+  @ManyToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor)
   sponsorLevel: SponsorLevel
 }

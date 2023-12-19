@@ -1,12 +1,12 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
-import { BaseEntity } from 'src/common/entities'
+import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { Address } from 'src/address/entities/address.entity'
 import { HospitalDoctors } from './hospitalDoctor.entity'
+import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'hospitals' })
 export class Hospital extends BaseEntity {
-  @Column('float')
-  distance: number
+  // @Column('float')
+  // distance: number
 
   @OneToOne(() => Address, (address) => address.hospital)
   @JoinColumn()
@@ -16,5 +16,5 @@ export class Hospital extends BaseEntity {
     () => HospitalDoctors,
     (hospitalDoctors) => hospitalDoctors.hospital
   )
-  hospitalDoctors: HospitalDoctors
+  hospitalDoctors: HospitalDoctors[]
 }

@@ -1,6 +1,6 @@
-import { Doctor } from 'src/doctors/entities/doctor.entity'
-import { Patient } from 'src/patient/entities/patient.entity'
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Patient } from 'src/patient/entities/patient.entity'
+import { Doctor } from 'src/doctors/entities/doctor.entity'
 
 @Entity({ name: 'reviews' })
 export class Review {

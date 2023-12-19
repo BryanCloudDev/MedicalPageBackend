@@ -10,6 +10,6 @@ export class ClinicDoctor {
   @ManyToOne(() => Doctor, (doctor) => doctor.hospitalDoctors)
   doctor: Doctor[]
 
-  @ManyToOne(() => Clinic, (clinic) => clinic.hospitalDoctors)
+  @ManyToOne(() => Clinic, (clinic) => clinic.clinicDoctors)
   clinic: Clinic[]
 }

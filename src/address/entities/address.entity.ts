@@ -1,8 +1,17 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm'
+import { Hospital } from 'src/hospital/entities/hospital.entity'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
-import { Hospital } from 'src/hospital/entities/hospital.entity'
 import { Clinic } from 'src/clinic/entities/clinic.entity'
+import { Country } from './country.entity'
+import { State } from './state.entity'
+import { City } from './city.entity'
 
 @Entity({ name: 'addresses' })
 export class Address {
@@ -26,4 +35,13 @@ export class Address {
 
   @OneToOne(() => Clinic, (clinic) => clinic.address)
   clinic: Clinic
+
+  @ManyToOne(() => Country, (country) => country.address)
+  country: Country
+
+  @ManyToOne(() => City, (city) => city.address)
+  city: City
+
+  @ManyToOne(() => State, (state) => state.address)
+  state: State
 }
