@@ -4,8 +4,8 @@ import { Doctor } from 'src/doctors/entities/doctor.entity'
 
 @Entity({ name: 'reviews' })
 export class Review {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column('integer')
   rating: number

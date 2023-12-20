@@ -4,8 +4,8 @@ import { Doctor } from 'src/doctors/entities/doctor.entity'
 
 @Entity({ name: 'appointments' })
 export class Appointment {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column('varchar')
   date: string
