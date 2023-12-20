@@ -1,13 +1,15 @@
 import { Entity, ManyToOne, OneToMany } from 'typeorm'
-import { BaseEntity } from 'src/common/entities'
+import { Item } from 'src/common/entities'
 import { Address } from './address.entity'
 import { State } from './state.entity'
 
 @Entity({ name: 'cities' })
-export class City extends BaseEntity {
-  @ManyToOne(() => State, (state) => state.cities)
+export class City extends Item {
+  @ManyToOne(() => State, (state) => state.cities, {
+    nullable: false
+  })
   state: State
 
-  @OneToMany(() => Address, (address) => address.country)
+  @OneToMany(() => Address, (address) => address.city)
   address?: Address[]
 }

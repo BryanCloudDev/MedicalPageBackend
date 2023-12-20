@@ -1,23 +1,15 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm'
 import { Hospital } from 'src/hospital/entities/hospital.entity'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
 import { Clinic } from 'src/clinic/entities/clinic.entity'
+import { BaseEntity } from 'src/common/entities'
 import { Country } from './country.entity'
 import { State } from './state.entity'
 import { City } from './city.entity'
 
 @Entity({ name: 'addresses' })
-export class Address {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
-
+export class Address extends BaseEntity {
   @Column('varchar')
   houseNumber: string
 
@@ -36,12 +28,18 @@ export class Address {
   @OneToOne(() => Clinic, (clinic) => clinic.address)
   clinic: Clinic
 
-  @ManyToOne(() => Country, (country) => country.address)
+  @ManyToOne(() => Country, (country) => country.address, {
+    nullable: false
+  })
   country: Country
 
-  @ManyToOne(() => City, (city) => city.address)
+  @ManyToOne(() => City, (city) => city.address, {
+    nullable: false
+  })
   city: City
 
-  @ManyToOne(() => State, (state) => state.address)
+  @ManyToOne(() => State, (state) => state.address, {
+    nullable: false
+  })
   state: State
 }

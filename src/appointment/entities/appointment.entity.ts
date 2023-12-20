@@ -1,21 +1,25 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToOne } from 'typeorm'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'appointments' })
-export class Appointment {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+export class Appointment extends BaseEntity {
+  @Column('datetime')
+  appointmentDate: Date
 
-  @Column('varchar')
-  date: string
-
-  @Column('text', { nullable: true })
+  @Column('text', {
+    nullable: true
+  })
   result?: string
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.appointments)
+  @ManyToOne(() => Doctor, (doctor) => doctor.appointments, {
+    nullable: false
+  })
   doctor: Doctor
 
-  @ManyToOne(() => Patient, (patient) => patient.appointments)
+  @ManyToOne(() => Patient, (patient) => patient.appointments, {
+    nullable: false
+  })
   patient: Patient
 }

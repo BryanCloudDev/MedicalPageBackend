@@ -1,15 +1,17 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, ManyToOne } from 'typeorm'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { BaseEntity } from 'src/common/entities'
 import { Clinic } from './clinic.entity'
 
 @Entity({ name: 'clinic_doctors' })
-export class ClinicDoctor {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+export class ClinicDoctor extends BaseEntity {
+  @ManyToOne(() => Doctor, (doctor) => doctor.clinicDoctors, {
+    nullable: false
+  })
+  doctor: Doctor
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.hospitalDoctors)
-  doctor: Doctor[]
-
-  @ManyToOne(() => Clinic, (clinic) => clinic.clinicDoctors)
-  clinic: Clinic[]
+  @ManyToOne(() => Clinic, (clinic) => clinic.clinicDoctors, {
+    nullable: false
+  })
+  clinic: Clinic
 }

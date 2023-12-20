@@ -9,15 +9,19 @@ import {
 import { SponsorLevel } from 'src/sponsor-level/entities/sponsor-level.entity'
 import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
+import { ClinicDoctor } from 'src/clinic/entities/clinicDoctor.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
+import { PhoneCode } from 'src/address/entities/phone-code.entity'
 import { Address } from 'src/address/entities/address.entity'
 import { Review } from 'src/reviews/entities/review.entity'
 import { User } from 'src/common/entities'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends User {
-  @Column('integer', { nullable: true })
-  phone?: number
+  @Column('varchar', {
+    nullable: true
+  })
+  phone?: string
 
   @Column('varchar')
   medicalLicense: string
@@ -27,25 +31,39 @@ export class Doctor extends User {
   })
   isSponsor: boolean
 
-  @Column('varchar', { nullable: true })
-  startDateSponsor?: string
+  @Column('datetime', {
+    nullable: true
+  })
+  startDateSponsor?: Date
 
   @OneToMany(() => Appointment, (appointment) => appointment.doctor)
   appointments?: Appointment[]
 
-  @ManyToOne(() => Specialty, (specialty) => specialty.doctors)
+  @ManyToOne(() => Specialty, (specialty) => specialty.doctors, {
+    nullable: false
+  })
   specialty: Specialty
 
-  @OneToOne(() => Address, (address) => address.doctor)
+  @OneToOne(() => Address, (address) => address.doctor, {
+    nullable: false
+  })
   @JoinColumn()
   address: Address
 
   @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
   hospitalDoctors: HospitalDoctors[]
 
-  @OneToMany(() => Review, (review) => review.doctor)
-  reviews?: Review[]
+  @OneToMany(() => ClinicDoctor, (clinicDoctors) => clinicDoctors.doctor)
+  clinicDoctors: ClinicDoctor[]
 
-  @ManyToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor)
+  @OneToMany(() => Review, (review) => review.doctor)
+  reviews: Review[]
+
+  @ManyToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor, {
+    nullable: false
+  })
   sponsorLevel: SponsorLevel
+
+  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.doctor)
+  phoneCode?: PhoneCode
 }

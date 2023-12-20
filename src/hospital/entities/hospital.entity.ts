@@ -1,11 +1,13 @@
 import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { Address } from 'src/address/entities/address.entity'
 import { HospitalDoctors } from './hospitalDoctor.entity'
-import { BaseEntity } from 'src/common/entities'
+import { Item } from 'src/common/entities'
 
 @Entity({ name: 'hospitals' })
-export class Hospital extends BaseEntity {
-  @OneToOne(() => Address, (address) => address.hospital)
+export class Hospital extends Item {
+  @OneToOne(() => Address, (address) => address.hospital, {
+    nullable: false
+  })
   @JoinColumn()
   address: Address
 
