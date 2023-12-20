@@ -15,8 +15,8 @@ import { City } from './city.entity'
 
 @Entity({ name: 'addresses' })
 export class Address {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column('varchar')
   houseNumber: string

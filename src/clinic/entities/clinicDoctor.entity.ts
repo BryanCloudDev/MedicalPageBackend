@@ -4,8 +4,8 @@ import { Clinic } from './clinic.entity'
 
 @Entity({ name: 'clinic_doctors' })
 export class ClinicDoctor {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @ManyToOne(() => Doctor, (doctor) => doctor.hospitalDoctors)
   doctor: Doctor[]
