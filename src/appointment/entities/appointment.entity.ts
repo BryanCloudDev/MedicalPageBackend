@@ -8,7 +8,7 @@ export class Appointment {
   id: number
 
   @Column('varchar')
-  date: number
+  date: string
 
   @Column('text', { nullable: true })
   result?: string

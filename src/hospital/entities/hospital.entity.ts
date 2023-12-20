@@ -5,9 +5,6 @@ import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'hospitals' })
 export class Hospital extends BaseEntity {
-  // @Column('float')
-  // distance: number
-
   @OneToOne(() => Address, (address) => address.hospital)
   @JoinColumn()
   address: Address
