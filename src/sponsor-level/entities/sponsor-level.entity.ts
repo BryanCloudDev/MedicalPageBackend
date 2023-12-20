@@ -1,13 +1,13 @@
 import { Column, Entity, OneToMany } from 'typeorm'
 import { Doctor } from 'src/doctors/entities/doctor.entity'
-import { BaseEntity } from 'src/common/entities'
+import { Item } from 'src/common/entities'
 
 @Entity({ name: 'sponsor_levels' })
-export class SponsorLevel extends BaseEntity {
+export class SponsorLevel extends Item {
   @Column('float')
   price: number
 
-  @Column('integer')
+  @Column('int')
   duration: number
 
   @Column('text')

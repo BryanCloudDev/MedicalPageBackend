@@ -1,10 +1,22 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 
 @Entity()
 export class BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column('varchar')
-  name: string
+  @CreateDateColumn()
+  createdOn: Date
+
+  @UpdateDateColumn()
+  updatedOn: Date
+
+  @DeleteDateColumn()
+  deletedOn: Date
 }

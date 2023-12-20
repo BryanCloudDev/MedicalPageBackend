@@ -1,10 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity } from 'typeorm'
+import { BaseEntity } from './baseEntity.entity'
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
-
+export class User extends BaseEntity {
   @Column('varchar')
   firstName: string
 
@@ -19,18 +17,20 @@ export class User {
   @Column('varchar')
   password: string
 
-  @Column('varchar', { nullable: true })
+  @Column('varchar', {
+    nullable: true
+  })
   mobilePhone?: string
 
-  @Column('varchar', { default: 'https://imgur.com/1Vr5Zsj' })
+  @Column('varchar', {
+    default: 'https://imgur.com/1Vr5Zsj',
+    nullable: true
+  })
   photo: string
 
-  @Column('varchar')
-  birthDate: string
+  @Column('date')
+  birthDate: Date
 
-  @Column('varchar')
-  createdAt: string
-
-  @Column('varchar')
-  lastLogin: string
+  @Column('datetime')
+  lastLoginOn: Date
 }
