@@ -9,14 +9,15 @@ import {
   DeleteObjectCommand,
   GetObjectCommand
 } from '@aws-sdk/client-s3'
-
 import { StorageService } from 'src/common/interfaces'
+import { File, FileResponse } from 'src/common/types'
+import { errorHandler } from 'src/common/utils'
 
 @Injectable()
 export class S3Service implements StorageService {
   constructor(readonly configService: ConfigService) {}
 
-  private readonly logger = new Logger('S3Service')
+  private readonly logger = new Logger(S3Service.name)
   private readonly bucketName = this.configService.get('AWS_BUCKET_NAME')
   private readonly client = new S3Client({
     region: this.configService.get('AWS_REGION'),
@@ -26,7 +27,7 @@ export class S3Service implements StorageService {
     }
   })
 
-  async uploadFile(folder: string, file: Express.Multer.File): Promise<string> {
+  async uploadFile(folder: string, file: File): Promise<string> {
     try {
       const fileId = v4()
       const fileExtension = file.mimetype.split('/')[1]
@@ -42,22 +43,27 @@ export class S3Service implements StorageService {
 
       return newFileName
     } catch (error) {
-      this.logger.error(error.message)
+      errorHandler(this.logger, error)
     }
   }
 
-  async getFile(folder: string, key: string): Promise<Readable> {
+  async getFile(folder: string, key: string): Promise<FileResponse> {
     try {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: `${folder}/${key}`
       })
 
-      const file = await this.client.send(command)
+      const { Body, ContentType, ContentLength } =
+        await this.client.send(command)
 
-      return file.Body as Readable
+      return {
+        file: Body as Readable,
+        contentType: ContentType,
+        contentLength: ContentLength
+      }
     } catch (error) {
-      this.logger.error(error)
+      errorHandler(this.logger, error)
     }
   }
 
@@ -77,15 +83,11 @@ export class S3Service implements StorageService {
       if (error.$metadata.httpStatusCode === 404) {
         return false
       }
-      this.logger.error(error)
+      errorHandler(this.logger, error)
     }
   }
 
-  async updateFile(
-    folder: string,
-    key: string,
-    file: Express.Multer.File
-  ): Promise<string> {
+  async updateFile(folder: string, key: string, file: File): Promise<string> {
     const fileName = await this.uploadFile(folder, file)
     await this.deleteFile(folder, key)
 
