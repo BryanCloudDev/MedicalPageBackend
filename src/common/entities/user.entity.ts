@@ -31,6 +31,8 @@ export class User extends BaseEntity {
   @Column('date')
   birthDate: Date
 
-  @Column('datetime')
+  @Column('datetime', {
+    nullable: true
+  })
   lastLoginOn: Date
 }

@@ -10,7 +10,7 @@ export class Country extends Item {
   states: State[]
 
   @OneToOne(() => PhoneCode, (phoneCode) => phoneCode.country, {
-    nullable: false
+    nullable: true
   })
   @JoinColumn()
   phoneCode: PhoneCode
