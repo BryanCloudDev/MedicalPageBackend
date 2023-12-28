@@ -14,6 +14,7 @@ import { HospitalModule } from './hospital/hospital.module'
 import { ClinicModule } from './clinic/clinic.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
+import { FileModule } from './file/file.module'
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
     HospitalModule,
     ClinicModule,
     ReviewsModule,
-    SponsorLevelModule
+    SponsorLevelModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService]
