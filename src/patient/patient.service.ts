@@ -1,11 +1,23 @@
-import { Injectable } from '@nestjs/common'
-import { CreatePatientDto } from './dto/create-patient.dto'
+import { Repository } from 'typeorm'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { UpdatePatientDto } from './dto/update-patient.dto'
+import { Patient } from './entities/patient.entity'
+import { FileService } from 'src/file/file.service'
+import { FolderType } from 'src/file/enums/folder.enum'
 
 @Injectable()
 export class PatientService {
-  create(createPatientDto: CreatePatientDto) {
-    return 'This action adds a new patient'
+  constructor(
+    @InjectRepository(Patient)
+    private readonly patientRepository: Repository<Patient>,
+    private readonly fileService: FileService
+  ) {}
+
+  private readonly logger = new Logger(PatientService.name)
+
+  async uploadPhoto(photo: Express.Multer.File) {
+    await this.fileService.uploadFile(FolderType.PATIENT, photo)
   }
 
   findAll() {
@@ -16,8 +28,13 @@ export class PatientService {
     return `This action returns a #${id} patient`
   }
 
+  async findByEmail(email: string): Promise<Patient> {
+    const patient = await this.patientRepository.findOneBy({ email })
+    return patient
+  }
+
   update(id: number, updatePatientDto: UpdatePatientDto) {
-    return `This action updates a #${id} patient`
+    return updatePatientDto
   }
 
   remove(id: number) {

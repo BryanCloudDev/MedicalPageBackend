@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm'
+import { BeforeInsert, Column, Entity } from 'typeorm'
 import { BaseEntity } from './baseEntity.entity'
+import * as bcrypt from 'bcrypt'
 
 @Entity()
 export class User extends BaseEntity {
@@ -14,7 +15,9 @@ export class User extends BaseEntity {
   })
   email: string
 
-  @Column('varchar')
+  @Column('varchar', {
+    select: false
+  })
   password: string
 
   @Column('varchar', {
@@ -31,6 +34,18 @@ export class User extends BaseEntity {
   @Column('date')
   birthDate: Date
 
-  @Column('datetime')
+  @Column('datetime', {
+    nullable: true
+  })
   lastLoginOn: Date
+
+  encrpytPassword() {
+    this.password = bcrypt.hashSync(this.password, 10)
+  }
+
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.email = this.email.toLowerCase().trim()
+    this.encrpytPassword()
+  }
 }
