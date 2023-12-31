@@ -1,14 +1,31 @@
-import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Post,
+  UseInterceptors,
+  UploadedFile
+} from '@nestjs/common'
 import { UpdatePatientDto } from './dto/update-patient.dto'
 import { PatientService } from './patient.service'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { fileFilter } from 'src/common/utils'
 
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
-  @Get()
-  findAll() {
-    return this.patientService.findAll()
+  @Post('upload/photo')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      fileFilter
+    })
+  )
+  uploadPhoto(@UploadedFile() photo: Express.Multer.File) {
+    return this.patientService.uploadPhoto(photo)
   }
 
   @Get(':id')

@@ -9,7 +9,6 @@ import { Repository } from 'typeorm'
 import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { AddressService, PhoneCodeService } from 'src/address/service'
 import { Patient } from 'src/patient/entities/patient.entity'
-import { FileService } from 'src/file/file.service'
 
 @Injectable()
 export class AuthService {
@@ -17,16 +16,12 @@ export class AuthService {
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
     private readonly phoneCodeService: PhoneCodeService,
-    private readonly addressService: AddressService,
-    private readonly fileService: FileService
+    private readonly addressService: AddressService
   ) {}
 
   private readonly logger = new Logger(AuthService.name)
 
-  async registerUser(
-    createPatientDto: CreatePatientDto,
-    photo: Express.Multer.File
-  ) {
+  async registerUser(createPatientDto: CreatePatientDto) {
     try {
       const { address, mobilePhone, ...patientPartial } = createPatientDto
       const { areaCodeId, number } = mobilePhone
@@ -50,15 +45,10 @@ export class AuthService {
         phoneCode
       })
 
-      if (photo) {
-        // console.log(await this.fileService.uploadFile('users', photo))
-        console.log(photo)
-      }
-
       return this.patientRepository.save(patientInstance)
     } catch (error) {
       this.logger.error(error)
-      throw new InternalServerErrorException('Contact the admin')
+      throw new InternalServerErrorException('Check server logs')
     }
   }
 }
