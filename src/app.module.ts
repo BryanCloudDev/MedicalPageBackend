@@ -15,6 +15,7 @@ import { ClinicModule } from './clinic/clinic.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { FileModule } from './file/file.module'
     ClinicModule,
     ReviewsModule,
     SponsorLevelModule,
-    FileModule
+    FileModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService]

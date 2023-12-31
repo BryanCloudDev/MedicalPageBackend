@@ -12,7 +12,7 @@ export class CheckEmailMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const email = String(req.fields.email)
+    const email = req.body.email as string
     const pathArray = req.url.split('/')
     const userType = pathArray[pathArray.length - 1]
 
