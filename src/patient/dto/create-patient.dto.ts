@@ -4,14 +4,16 @@ import {
   IsNotEmptyObject,
   IsOptional,
   IsString,
-  IsStrongPassword,
   Length,
+  Matches,
+  MaxLength,
+  MinLength,
   ValidateNested
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { MobilePhoneDto } from './mobilePhone.dto'
 import { CreateAddressDto } from 'src/address/dto/create-address.dto'
 import { IsLaterThan } from 'src/common/decorators'
+import { MobilePhoneDto } from './mobilePhone.dto'
 
 export class CreatePatientDto {
   @IsString()
@@ -25,16 +27,18 @@ export class CreatePatientDto {
   @IsEmail()
   email: string
 
-  @IsStrongPassword()
+  @IsString()
+  @MinLength(6)
+  @MaxLength(50)
+  @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message: 'The password must have a Uppercase, lowercase letter and a number'
+  })
   password: string
 
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => MobilePhoneDto)
   mobilePhone?: MobilePhoneDto
-
-  // @Column('varchar', { default: 'https://imgur.com/1Vr5Zsj' })
-  // photo: string
 
   @IsDate()
   @IsLaterThan()
