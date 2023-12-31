@@ -5,7 +5,7 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto'
 @Injectable()
 export class DoctorsService {
   create(createDoctorDto: CreateDoctorDto) {
-    return 'This action adds a new doctor'
+    return createDoctorDto
   }
 
   findAll() {
@@ -16,8 +16,14 @@ export class DoctorsService {
     return `This action returns a #${id} doctor`
   }
 
+  async findByEmail(email: string) {
+    return email
+    // const patient = await this.patientRepository.findOneBy({ email })
+    // return patient
+  }
+
   update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return `This action updates a #${id} doctor`
+    return updateDoctorDto
   }
 
   remove(id: number) {
