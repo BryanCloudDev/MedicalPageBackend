@@ -8,9 +8,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
 import { META_ROLES } from 'src/auth/decorators/role-protected.decorator'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
-import { Patient } from 'src/patient/entities/patient.entity'
-import { UserRoles } from '../enums'
+import { User } from 'src/user/entities/user.entity'
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -28,19 +26,15 @@ export class UserRoleGuard implements CanActivate {
     }
 
     const req = context.switchToHttp().getRequest()
-    const user = req.user as Patient | Doctor
+    const user = req.user as User
 
     if (!user) {
       throw new InternalServerErrorException('User not found (request)')
     }
 
-    for (const validRole of validRoles) {
-      const userType =
-        user instanceof Doctor ? UserRoles.DOCTOR : UserRoles.PATIENT
-
-      if (userType === validRole) {
-        return true
-      }
+    const userRole = user.role
+    if (validRoles.includes(userRole)) {
+      return true
     }
 
     throw new ForbiddenException('You are unathorized')

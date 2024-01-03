@@ -12,13 +12,8 @@ export class AuthController {
     return this.authService.registerPatient(createPatientDto)
   }
 
-  @Post('login/patient')
+  @Post('login')
   loginPatient(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.loginPatient(loginUserDto)
-  }
-
-  @Post('login/doctor')
-  loginDoctor(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.loginDoctor(loginUserDto)
+    return this.authService.loginUser(loginUserDto)
   }
 }

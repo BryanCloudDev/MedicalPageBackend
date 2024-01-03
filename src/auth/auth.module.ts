@@ -6,29 +6,22 @@ import {
   RequestMethod
 } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { JwtModule } from '@nestjs/jwt'
 import { CheckEmailMiddleware } from './middlewares/check-email/check-email.middleware'
-import { Patient } from 'src/patient/entities/patient.entity'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
 import { AddressModule } from 'src/address/address.module'
-import { PatientModule } from 'src/patient/patient.module'
-import { DoctorsModule } from 'src/doctors/doctors.module'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { AuthController } from './auth.controller'
 import { FileModule } from 'src/file/file.module'
 import { AuthService } from './auth.service'
+import { UserModule } from 'src/user/user.module'
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Patient]),
-    TypeOrmModule.forFeature([Doctor]),
     FileModule,
     AddressModule,
-    PatientModule,
-    DoctorsModule,
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -41,7 +34,7 @@ import { AuthService } from './auth.service'
       })
     })
   ],
-  exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule]
+  exports: [JwtStrategy, PassportModule, JwtModule]
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

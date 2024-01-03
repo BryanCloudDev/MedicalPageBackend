@@ -8,24 +8,20 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
+import { compareSync } from 'bcrypt'
 import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { AddressService, PhoneCodeService } from 'src/address/service'
-import { Patient } from 'src/patient/entities/patient.entity'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { User } from 'src/user/entities/user.entity'
 import { JwtPayload, Token } from './interfaces'
 import { currentDate } from 'src/common/utils'
-import { UserRepository } from './types'
+import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
-import { compareSync } from 'bcrypt'
-import { UserRoles } from './enums'
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>,
-    @InjectRepository(Doctor)
-    private readonly doctorRepository: Repository<Doctor>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly addressService: AddressService,
     private readonly jwtService: JwtService
@@ -34,65 +30,47 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name)
 
   async registerPatient(createPatientDto: CreatePatientDto) {
-    try {
-      const { address, mobilePhone, ...patientPartial } = createPatientDto
-      const { areaCodeId, number } = mobilePhone
+    const {
+      address: addressDto,
+      mobilePhone,
+      ...patientPartial
+    } = createPatientDto
+    const { areaCodeId, number } = mobilePhone
 
-      const phoneCode = await this.phoneCodeService.findById(
-        mobilePhone.areaCodeId
+    const phoneCode = await this.phoneCodeService.findById(
+      mobilePhone.areaCodeId
+    )
+
+    if (!phoneCode) {
+      throw new NotFoundException(
+        `Phone code with id ${areaCodeId} was not found`
       )
+    }
 
-      if (!phoneCode) {
-        throw new NotFoundException(
-          `Phone code with id ${areaCodeId} was not found`
-        )
-      }
+    try {
+      const address = await this.addressService.create(addressDto)
 
-      const addressInstance = await this.addressService.create(address)
-
-      const patientInstance = this.patientRepository.create({
+      const userInstance = this.userRepository.create({
         ...patientPartial,
-        address: addressInstance,
         mobilePhone: number,
-        phoneCode
+        role: Roles.PATIENT,
+        phoneCode,
+        address,
+        patient: {}
       })
 
-      return this.patientRepository.save(patientInstance)
+      return this.userRepository.save(userInstance)
     } catch (error) {
       this.logger.error(error)
       throw new InternalServerErrorException('Check server logs')
     }
   }
 
-  async loginPatient(loginUserDto: LoginUserDto) {
-    const token = await this.loginUser(
-      loginUserDto,
-      this.patientRepository,
-      UserRoles.PATIENT
-    )
-
-    return token
-  }
-
-  async loginDoctor(loginUserDto: LoginUserDto) {
-    const token = await this.loginUser(
-      loginUserDto,
-      this.doctorRepository,
-      UserRoles.DOCTOR
-    )
-
-    return token
-  }
-
-  private async loginUser(
-    { password, email }: LoginUserDto,
-    userRepository: UserRepository,
-    role: UserRoles
-  ): Promise<Token> {
-    let user: Patient | Doctor
+  async loginUser({ password, email }: LoginUserDto): Promise<Token> {
+    let user: User
 
     try {
-      user = await userRepository.findOne({
+      user = await this.userRepository.findOne({
         where: { email },
         select: { password: true, id: true }
       })
@@ -105,11 +83,11 @@ export class AuthService {
     const { id } = user
 
     try {
-      await userRepository.update(id, { lastLoginOn: currentDate() })
+      await this.userRepository.update(id, { lastLoginOn: currentDate() })
     } catch (error) {}
 
     return {
-      token: this.getJwtToken({ id, role })
+      token: this.getJwtToken({ id })
     }
   }
 

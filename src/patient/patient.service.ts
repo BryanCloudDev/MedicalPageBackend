@@ -28,11 +28,6 @@ export class PatientService {
     return `This action returns a #${id} patient`
   }
 
-  async findByEmail(email: string): Promise<Patient> {
-    const patient = await this.patientRepository.findOneBy({ email })
-    return patient
-  }
-
   update(id: number, updatePatientDto: UpdatePatientDto) {
     return updatePatientDto
   }

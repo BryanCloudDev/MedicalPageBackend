@@ -1,23 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { InjectRepository } from '@nestjs/typeorm'
 import { ConfigService } from '@nestjs/config'
-import { Repository } from 'typeorm'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { Patient } from 'src/patient/entities/patient.entity'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
-import { User } from '../../common/entities/user.entity'
+import { UserService } from 'src/user/user.service'
 import { JwtPayload } from '../interfaces'
-import { UserRoles } from '../enums'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>,
-    @InjectRepository(Doctor)
-    private readonly doctorRepository: Repository<Doctor>,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly userService: UserService
   ) {
     super({
       secretOrKey: configService.get('JWT_SECRET'),
@@ -26,24 +18,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const { id, role } = payload
+    const { id } = payload
 
-    let user: Doctor | User
-
-    if (role === UserRoles.PATIENT) {
-      user = await this.patientRepository.findOneBy({ id })
-    }
-
-    if (role === UserRoles.DOCTOR) {
-      user = await this.doctorRepository.findOneBy({ id })
-    }
+    const user = await this.userService.findById(id)
 
     if (!user) {
       throw new UnauthorizedException('Token is not valid')
     }
 
     if (user.deletedOn) {
-      throw new UnauthorizedException('User is inactive')
+      throw new UnauthorizedException(
+        'User is inactive, contact the administrator'
+      )
     }
 
     return user
