@@ -17,6 +17,6 @@ export class PhoneCodeService {
   }
 
   findById(id: string): Promise<PhoneCode> {
-    return this.phoneCodeRepository.findOneByOrFail({ id })
+    return this.phoneCodeRepository.findOneBy({ id })
   }
 }

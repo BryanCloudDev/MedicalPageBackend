@@ -11,13 +11,12 @@ import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { ClinicDoctor } from 'src/clinic/entities/clinicDoctor.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
-import { PhoneCode } from 'src/address/entities/phone-code.entity'
-import { Address } from 'src/address/entities/address.entity'
 import { Review } from 'src/reviews/entities/review.entity'
-import { User } from 'src/common/entities'
+import { User } from 'src/user/entities/user.entity'
+import { BaseEntity } from 'src/common/entities'
 
 @Entity({ name: 'doctors' })
-export class Doctor extends User {
+export class Doctor extends BaseEntity {
   @Column('varchar', {
     nullable: true
   })
@@ -36,19 +35,14 @@ export class Doctor extends User {
   })
   startDateSponsor?: Date
 
-  @OneToMany(() => Appointment, (appointment) => appointment.doctor)
-  appointments?: Appointment[]
-
-  @ManyToOne(() => Specialty, (specialty) => specialty.doctors, {
-    nullable: false
-  })
-  specialty: Specialty
-
-  @OneToOne(() => Address, (address) => address.doctor, {
+  @OneToOne(() => User, (user) => user.patient, {
     nullable: false
   })
   @JoinColumn()
-  address: Address
+  user: User
+
+  @OneToMany(() => Appointment, (appointment) => appointment.doctor)
+  appointments?: Appointment[]
 
   @OneToMany(() => HospitalDoctors, (hospitalDoctors) => hospitalDoctors.doctor)
   hospitalDoctors: HospitalDoctors[]
@@ -59,11 +53,13 @@ export class Doctor extends User {
   @OneToMany(() => Review, (review) => review.doctor)
   reviews: Review[]
 
+  @ManyToOne(() => Specialty, (specialty) => specialty.doctors, {
+    nullable: false
+  })
+  specialty: Specialty
+
   @ManyToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor, {
     nullable: false
   })
   sponsorLevel: SponsorLevel
-
-  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.doctor)
-  phoneCode?: PhoneCode
 }

@@ -1,8 +1,7 @@
 import { Column, Entity, ManyToOne, OneToOne } from 'typeorm'
 import { Hospital } from 'src/hospital/entities/hospital.entity'
-import { Patient } from 'src/patient/entities/patient.entity'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
 import { Clinic } from 'src/clinic/entities/clinic.entity'
+import { User } from 'src/user/entities/user.entity'
 import { BaseEntity } from 'src/common/entities'
 import { Country } from './country.entity'
 import { State } from './state.entity'
@@ -16,11 +15,8 @@ export class Address extends BaseEntity {
   @Column('varchar')
   streetNumber: string
 
-  @OneToOne(() => Doctor, (doctor) => doctor.address)
-  doctor: Doctor
-
-  @OneToOne(() => Patient, (patient) => patient.address)
-  patient: Patient
+  @OneToOne(() => User, (user) => user.address)
+  user: User
 
   @OneToOne(() => Hospital, (hospital) => hospital.address)
   hospital: Hospital

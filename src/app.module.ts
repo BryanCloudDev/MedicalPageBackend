@@ -16,6 +16,7 @@ import { ReviewsModule } from './reviews/reviews.module'
 import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
 import { AuthModule } from './auth/auth.module'
+import { UserModule } from './user/user.module'
 
 @Module({
   imports: [
@@ -32,18 +33,19 @@ import { AuthModule } from './auth/auth.module'
       autoLoadEntities: true,
       synchronize: true
     }),
+    AddressModule,
+    AppointmentModule,
+    AuthModule,
+    ClinicModule,
     CommonModule,
     DoctorsModule,
-    PatientModule,
-    AppointmentModule,
-    SpecialtyModule,
-    AddressModule,
-    HospitalModule,
-    ClinicModule,
-    ReviewsModule,
-    SponsorLevelModule,
     FileModule,
-    AuthModule
+    HospitalModule,
+    PatientModule,
+    ReviewsModule,
+    SpecialtyModule,
+    SponsorLevelModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService]
