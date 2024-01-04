@@ -1,8 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { City } from '../entities/city.entity'
 import { State } from '../entities/state.entity'
+import { errorHandler } from 'src/common/utils'
+import { City } from '../entities/city.entity'
 
 @Injectable()
 export class CityService {
@@ -11,12 +12,26 @@ export class CityService {
     private readonly cityRepository: Repository<City>
   ) {}
 
-  create(name: string, state: State): Promise<City> {
-    const city = this.cityRepository.create({ name, state })
-    return this.cityRepository.save(city)
+  private readonly logger = new Logger(CityService.name)
+
+  async create(name: string, state: State): Promise<City> {
+    try {
+      const cityInstance = this.cityRepository.create({ name, state })
+      const city = await this.cityRepository.save(cityInstance)
+
+      return city
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
   }
 
-  findById(id: string): Promise<City> {
-    return this.cityRepository.findOneBy({ id })
+  async findById(id: string): Promise<City> {
+    try {
+      const city = await this.cityRepository.findOneBy({ id })
+
+      return city
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
   }
 }

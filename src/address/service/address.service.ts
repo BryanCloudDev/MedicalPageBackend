@@ -1,14 +1,17 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { Address } from '../entities/address.entity'
 import { CreateAddressDto } from '../dto/create-address.dto'
-import { elSalvadorDb } from '../el-salvador-cities-departments'
+// import { elSalvadorDb } from '../el-salvador-cities-departments'
 import { StateService } from './state.service'
 import { CountryService } from './country.service'
 import { CityService } from './city.service'
 import { City } from '../entities/city.entity'
 import { PhoneCodeService } from './phone-code.service'
+import { errorHandler } from 'src/common/utils'
+import { Country } from '../entities/country.entity'
+import { State } from '../entities/state.entity'
 
 @Injectable()
 export class AddressService {
@@ -21,6 +24,8 @@ export class AddressService {
     private readonly cityService: CityService
   ) {}
 
+  private readonly logger = new Logger(AddressService.name)
+
   async create(createAddressDto: CreateAddressDto): Promise<Address> {
     const { countryId, stateId, cityId, ...partialAddress } = createAddressDto
 
@@ -28,11 +33,17 @@ export class AddressService {
     const statePromise = this.stateService.findById(stateId)
     const cityPromise = this.cityService.findById(cityId)
 
-    const [country, state, city] = await Promise.all([
-      countryPromise,
-      statePromise,
-      cityPromise
-    ])
+    let country: Country, state: State, city: City
+
+    try {
+      ;[country, state, city] = await Promise.all([
+        countryPromise,
+        statePromise,
+        cityPromise
+      ])
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
 
     if (!country) {
       throw new NotFoundException(`Country with ID ${countryId} not found`)
@@ -46,33 +57,39 @@ export class AddressService {
       throw new NotFoundException(`City with ID ${cityId} not found`)
     }
 
-    const address = this.addressRepository.create({
-      ...partialAddress,
-      country,
-      state,
-      city
-    })
+    try {
+      const addressInstance = this.addressRepository.create({
+        ...partialAddress,
+        country,
+        state,
+        city
+      })
 
-    return this.addressRepository.save(address)
+      const address = await this.addressRepository.save(addressInstance)
+
+      return address
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
   }
 
   // run seed for ES data
-  async runSeed() {
-    const states = new Set(elSalvadorDb.map((city) => city.state)).keys()
-    const country = await this.countryService.create('El Salvador')
-    await this.phoneCodeService.create('+503', country)
-    const citiesItems: Promise<City>[] = []
+  // async runSeed() {
+  //   const states = new Set(elSalvadorDb.map((city) => city.state)).keys()
+  //   const country = await this.countryService.create('El Salvador')
+  //   await this.phoneCodeService.create('+503', country)
+  //   const citiesItems: Promise<City>[] = []
 
-    for (const state of states) {
-      const stateToBeCreated = await this.stateService.create(state, country)
+  //   for (const state of states) {
+  //     const stateToBeCreated = await this.stateService.create(state, country)
 
-      const citiesPerState = elSalvadorDb.filter((city) => city.state === state)
+  //     const citiesPerState = elSalvadorDb.filter((city) => city.state === state)
 
-      for (const city of citiesPerState) {
-        citiesItems.push(this.cityService.create(city.city, stateToBeCreated))
-      }
-    }
+  //     for (const city of citiesPerState) {
+  //       citiesItems.push(this.cityService.create(city.city, stateToBeCreated))
+  //     }
+  //   }
 
-    await Promise.all(citiesItems)
-  }
+  //   await Promise.all(citiesItems)
+  // }
 }
