@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Country } from '../entities/country.entity'
-import { errorHandler } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class CountryService {
@@ -20,7 +20,7 @@ export class CountryService {
 
       return country
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -30,7 +30,7 @@ export class CountryService {
 
       return country
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -42,7 +42,7 @@ export class CountryService {
 
       return countries
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }

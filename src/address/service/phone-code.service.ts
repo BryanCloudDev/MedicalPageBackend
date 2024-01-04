@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { PhoneCode } from '../entities/phone-code.entity'
 import { Country } from '../entities/country.entity'
-import { errorHandler } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class PhoneCodeService {
@@ -24,16 +24,17 @@ export class PhoneCodeService {
       const phoneCode = await this.phoneCodeRepository.save(phoneCodeInstance)
       return phoneCode
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
   async findById(id: string): Promise<PhoneCode> {
     try {
       const phoneCode = await this.phoneCodeRepository.findOneBy({ id })
+
       return phoneCode
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -43,7 +44,7 @@ export class PhoneCodeService {
 
       return phoneCodes
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }

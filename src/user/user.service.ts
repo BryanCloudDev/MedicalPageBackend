@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { errorHandler } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 import { User } from './entities/user.entity'
 import { Repository } from 'typeorm'
 
@@ -19,7 +19,7 @@ export class UserService {
       const patient = await this.userRepository.findOneBy({ email })
       return patient
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -31,7 +31,7 @@ export class UserService {
       })
       return patient
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -39,7 +39,7 @@ export class UserService {
     try {
       await this.userRepository.softDelete({ id })
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -48,7 +48,7 @@ export class UserService {
     try {
       await this.userRepository.update(id, { ...rest })
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -61,7 +61,7 @@ export class UserService {
 
       return user
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }

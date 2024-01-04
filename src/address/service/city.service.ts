@@ -1,8 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
+import { exceptionHandler } from 'src/common/utils'
 import { State } from '../entities/state.entity'
-import { errorHandler } from 'src/common/utils'
 import { City } from '../entities/city.entity'
 
 @Injectable()
@@ -21,7 +21,7 @@ export class CityService {
 
       return city
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -31,7 +31,7 @@ export class CityService {
 
       return city
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }

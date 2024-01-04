@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm'
-import { Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UpdatePatientDto } from './dto/update-patient.dto'
 import { Patient } from './entities/patient.entity'
@@ -7,7 +7,7 @@ import { FileService } from 'src/file/file.service'
 import { FolderType } from 'src/file/enums/folder.enum'
 import { User } from 'src/user/entities/user.entity'
 import { UserService } from 'src/user/user.service'
-import { badRequestError, internalServerError } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class PatientService {
@@ -21,17 +21,15 @@ export class PatientService {
   private readonly logger = new Logger(PatientService.name)
 
   async uploadPhoto(file: Express.Multer.File, { id }: User) {
-    if (!file) badRequestError('File is required')
-
-    let photo: string
-
     try {
-      photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
-    } catch (error) {
-      this.handleErrors(error)
-    }
+      if (!file) throw new BadRequestException('File is required')
 
-    await this.userService.updateById(id, { photo })
+      const photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
+
+      await this.userService.updateById(id, { photo })
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
   async create(user: User) {
@@ -41,7 +39,7 @@ export class PatientService {
 
       return patient
     } catch (error) {
-      this.handleErrors(error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -55,7 +53,7 @@ export class PatientService {
 
       return patient
     } catch (error) {
-      this.handleErrors(error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -71,13 +69,8 @@ export class PatientService {
     try {
       await this.userService.deleteById(id)
     } catch (error) {
-      this.handleErrors(error)
+      exceptionHandler(this.logger, error)
     }
-  }
-
-  private handleErrors(error: any) {
-    internalServerError(JSON.parse(error.message))
-    this.logger.error(error)
   }
 
   private flatUser(user: User) {

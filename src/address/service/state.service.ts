@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { State } from '../entities/state.entity'
 import { Country } from '../entities/country.entity'
-import { errorHandler } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class StateService {
@@ -21,7 +21,7 @@ export class StateService {
 
       return state
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -31,7 +31,7 @@ export class StateService {
 
       return state
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }
