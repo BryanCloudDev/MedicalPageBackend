@@ -1,24 +1,21 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { Address } from '../entities/address.entity'
 import { CreateAddressDto } from '../dto/create-address.dto'
-// import { elSalvadorDb } from '../el-salvador-cities-departments'
-import { StateService } from './state.service'
-import { CountryService } from './country.service'
-import { CityService } from './city.service'
-import { City } from '../entities/city.entity'
-import { PhoneCodeService } from './phone-code.service'
-import { errorHandler } from 'src/common/utils'
+import { Address } from '../entities/address.entity'
 import { Country } from '../entities/country.entity'
+import { CountryService } from './country.service'
 import { State } from '../entities/state.entity'
+import { errorHandler } from 'src/common/utils'
+import { City } from '../entities/city.entity'
+import { StateService } from './state.service'
+import { CityService } from './city.service'
 
 @Injectable()
 export class AddressService {
   constructor(
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
-    private readonly phoneCodeService: PhoneCodeService,
     private readonly countryService: CountryService,
     private readonly stateService: StateService,
     private readonly cityService: CityService
@@ -72,24 +69,4 @@ export class AddressService {
       errorHandler(this.logger, error)
     }
   }
-
-  // run seed for ES data
-  // async runSeed() {
-  //   const states = new Set(elSalvadorDb.map((city) => city.state)).keys()
-  //   const country = await this.countryService.create('El Salvador')
-  //   await this.phoneCodeService.create('+503', country)
-  //   const citiesItems: Promise<City>[] = []
-
-  //   for (const state of states) {
-  //     const stateToBeCreated = await this.stateService.create(state, country)
-
-  //     const citiesPerState = elSalvadorDb.filter((city) => city.state === state)
-
-  //     for (const city of citiesPerState) {
-  //       citiesItems.push(this.cityService.create(city.city, stateToBeCreated))
-  //     }
-  //   }
-
-  //   await Promise.all(citiesItems)
-  // }
 }

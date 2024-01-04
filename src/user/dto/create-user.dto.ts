@@ -45,6 +45,10 @@ export class CreateUserDto {
   @Type(() => Date)
   birthDate: Date
 
+  @IsString()
+  @IsOptional()
+  photo: string
+
   @ValidateNested({ each: true })
   @Type(() => CreateAddressDto)
   @IsNotEmptyObject()

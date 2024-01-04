@@ -36,4 +36,14 @@ export class PhoneCodeService {
       errorHandler(this.logger, error)
     }
   }
+
+  async getAll() {
+    try {
+      const phoneCodes = await this.phoneCodeRepository.find()
+
+      return phoneCodes
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
+  }
 }

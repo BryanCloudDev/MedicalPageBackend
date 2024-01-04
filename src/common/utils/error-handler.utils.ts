@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   InternalServerErrorException,
   Logger,
   NotFoundException
@@ -31,4 +32,8 @@ export const notFoundError = (message: string) => {
 
 export const unauthorizedError = (message: string) => {
   throw new UnauthorizedException(message)
+}
+
+export const badRequestError = (message: string) => {
+  throw new BadRequestException(message)
 }

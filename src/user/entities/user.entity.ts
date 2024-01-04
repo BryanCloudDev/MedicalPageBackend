@@ -57,20 +57,17 @@ export class User extends BaseEntity {
   role: Roles
 
   @OneToOne(() => Patient, (patient) => patient.user, {
-    nullable: false,
-    cascade: true
+    nullable: false
   })
   patient: Patient
 
   @OneToOne(() => Doctor, (doctor) => doctor.user, {
-    nullable: false,
-    cascade: true
+    nullable: false
   })
   doctor: Doctor
 
   @OneToOne(() => Address, (address) => address.user, {
-    nullable: false,
-    cascade: true
+    nullable: false
   })
   @JoinColumn()
   address: Address

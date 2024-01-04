@@ -16,6 +16,7 @@ import {
 } from 'src/common/utils'
 import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
+import { PatientService } from 'src/patient/patient.service'
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
+    private readonly patientService: PatientService,
     private readonly addressService: AddressService,
     private readonly jwtService: JwtService
   ) {}
@@ -49,6 +51,7 @@ export class AuthService {
       notFoundError(`Phone code with id ${areaCodeId} was not found`)
     }
 
+    let user: User
     try {
       const address = await this.addressService.create(addressDto)
 
@@ -61,9 +64,19 @@ export class AuthService {
         patient: {}
       })
 
-      return this.userRepository.save(userInstance)
+      user = await this.userRepository.save(userInstance)
     } catch (error) {
       this.handleErrors(error)
+    }
+
+    try {
+      await this.patientService.create(user)
+    } catch (error) {
+      this.handleErrors(error)
+    }
+
+    return {
+      token: this.getJwtToken({ id: user.id })
     }
   }
 

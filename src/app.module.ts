@@ -17,6 +17,7 @@ import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -45,7 +46,8 @@ import { UserModule } from './user/user.module'
     ReviewsModule,
     SpecialtyModule,
     SponsorLevelModule,
-    UserModule
+    UserModule,
+    SeedModule
   ],
   controllers: [AppController],
   providers: [AppService]

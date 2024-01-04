@@ -33,4 +33,16 @@ export class CountryService {
       errorHandler(this.logger, error)
     }
   }
+
+  async getAll() {
+    try {
+      const countries = await this.countryRepository.find({
+        relations: { states: { cities: true } }
+      })
+
+      return countries
+    } catch (error) {
+      errorHandler(this.logger, error)
+    }
+  }
 }

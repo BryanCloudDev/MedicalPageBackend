@@ -5,41 +5,60 @@ import {
   Patch,
   Param,
   Delete,
-  Post,
   UseInterceptors,
-  UploadedFile
+  UploadedFile,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
-import { UpdatePatientDto } from './dto/update-patient.dto'
-import { PatientService } from './patient.service'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { UpdatePatientDto } from './dto/update-patient.dto'
+import { User } from 'src/user/entities/user.entity'
+import { Auth, GetUser } from 'src/auth/decorators'
+import { PatientService } from './patient.service'
 import { fileFilter } from 'src/common/utils'
+import { Roles } from 'src/user/enums'
 
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
-  @Post('upload/photo')
+  @Patch('upload/photo')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseInterceptors(
     FileInterceptor('photo', {
-      fileFilter
+      fileFilter: fileFilter
     })
   )
-  uploadPhoto(@UploadedFile() photo: Express.Multer.File) {
-    return this.patientService.uploadPhoto(photo)
+  @Auth(Roles.PATIENT)
+  uploadPhoto(
+    @UploadedFile()
+    file: Express.Multer.File,
+    @GetUser() user: User
+  ) {
+    return this.patientService.uploadPhoto(file, user)
+  }
+
+  @Get('profile')
+  @Auth(Roles.PATIENT)
+  getPatientProfile(@GetUser() user: User) {
+    return this.patientService.getPatientProfile(user)
   }
 
   @Get(':id')
+  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR)
   findOne(@Param('id') id: string) {
-    return this.patientService.findOne(+id)
+    return this.patientService.findOneById(id)
   }
 
   @Patch(':id')
+  @Auth(Roles.ADMINISTRATOR, Roles.PATIENT)
   update(@Param('id') id: string, @Body() updatePatientDto: UpdatePatientDto) {
-    return this.patientService.update(+id, updatePatientDto)
+    return this.patientService.update(id, updatePatientDto)
   }
 
   @Delete(':id')
+  @Auth(Roles.ADMINISTRATOR)
   remove(@Param('id') id: string) {
-    return this.patientService.remove(+id)
+    return this.patientService.deleteById(id)
   }
 }

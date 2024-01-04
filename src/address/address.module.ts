@@ -24,6 +24,12 @@ import {
     CountryService,
     StateService
   ],
-  exports: [AddressService, PhoneCodeService]
+  exports: [
+    AddressService,
+    PhoneCodeService,
+    CityService,
+    CountryService,
+    StateService
+  ]
 })
 export class AddressModule {}

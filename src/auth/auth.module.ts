@@ -14,6 +14,7 @@ import { AuthController } from './auth.controller'
 import { FileModule } from 'src/file/file.module'
 import { AuthService } from './auth.service'
 import { UserModule } from 'src/user/user.module'
+import { PatientModule } from 'src/patient/patient.module'
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
@@ -22,6 +23,7 @@ import { UserModule } from 'src/user/user.module'
     FileModule,
     AddressModule,
     UserModule,
+    PatientModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
