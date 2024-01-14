@@ -25,17 +25,20 @@ export class Address extends BaseEntity {
   clinic: Clinic
 
   @ManyToOne(() => Country, (country) => country.address, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   country: Country
 
   @ManyToOne(() => City, (city) => city.address, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   city: City
 
   @ManyToOne(() => State, (state) => state.address, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   state: State
 }

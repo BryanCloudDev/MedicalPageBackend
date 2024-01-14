@@ -38,26 +38,36 @@ export class PatientController {
     return this.patientService.uploadPhoto(file, user)
   }
 
-  @Get('profile')
-  @Auth(Roles.PATIENT)
+  // @Get('profile')
+  // @Auth(Roles.PATIENT)
   getPatientProfile(@GetUser() user: User) {
     return this.patientService.getPatientProfile(user)
   }
 
-  @Get(':id')
-  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR)
+  // @Get(':id')
+  // @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR)
   findOne(@Param('id') id: string) {
-    return this.patientService.findOneById(id)
+    return this.patientService.findById(id)
   }
 
-  @Patch(':id')
-  @Auth(Roles.ADMINISTRATOR, Roles.PATIENT)
+  // @Patch()
+  // @Auth(Roles.PATIENT)
+  updateByUserToken(
+    @GetUser() user: User,
+    @Body() updatePatientDto: UpdatePatientDto
+  ) {
+    const { id } = user
+    return this.patientService.updateById(id, updatePatientDto)
+  }
+
+  // @Patch(':id')
+  // @Auth(Roles.ADMINISTRATOR)
   update(@Param('id') id: string, @Body() updatePatientDto: UpdatePatientDto) {
-    return this.patientService.update(id, updatePatientDto)
+    return this.patientService.updateById(id, updatePatientDto)
   }
 
-  @Delete(':id')
-  @Auth(Roles.ADMINISTRATOR)
+  // @Delete(':id')
+  // @Auth(Roles.ADMINISTRATOR)
   remove(@Param('id') id: string) {
     return this.patientService.deleteById(id)
   }

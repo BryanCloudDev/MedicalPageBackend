@@ -36,16 +36,14 @@ export class AuthService {
       mobilePhone,
       ...patientPartial
     } = createPatientDto
-    const { areaCodeId, number } = mobilePhone
+    const { regionNumberId, number } = mobilePhone
 
     try {
-      const phoneCode = await this.phoneCodeService.findById(
-        mobilePhone.areaCodeId
-      )
+      const phoneCode = await this.phoneCodeService.findById(regionNumberId)
 
       if (!phoneCode) {
         throw new NotFoundException(
-          `Phone code with id ${areaCodeId} was not found`
+          `Phone code with id ${regionNumberId} was not found`
         )
       }
 

@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { UserService } from 'src/user/user.service'
 import { exceptionHandler } from 'src/common/utils'
 import { JwtPayload } from '../interfaces'
+import { User } from 'src/user/entities/user.entity'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -20,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private readonly logger = new Logger(JwtStrategy.name)
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<User> {
     try {
       const { id } = payload
 
@@ -30,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new UnauthorizedException('Token is not valid')
       }
 
-      if (user.deletedOn) {
+      if (!user.isActive) {
         throw new UnauthorizedException(
           'User is inactive, contact the administrator'
         )

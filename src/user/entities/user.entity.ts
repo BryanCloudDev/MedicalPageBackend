@@ -56,23 +56,33 @@ export class User extends BaseEntity {
   })
   role: Roles
 
+  @Column('bool', {
+    default: true
+  })
+  isActive: boolean
+
   @OneToOne(() => Patient, (patient) => patient.user, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   patient: Patient
 
   @OneToOne(() => Doctor, (doctor) => doctor.user, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   doctor: Doctor
 
   @OneToOne(() => Address, (address) => address.user, {
-    nullable: false
+    nullable: false,
+    eager: true
   })
   @JoinColumn()
   address: Address
 
-  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.user)
+  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.user, {
+    eager: true
+  })
   phoneCode?: PhoneCode
 
   private encrpytPassword() {

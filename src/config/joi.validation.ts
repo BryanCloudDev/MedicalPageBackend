@@ -11,5 +11,7 @@ export const JoiValidationSchema = Joi.object({
   DB_PORT: Joi.number().default(3306),
   DB_USERNAME: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
-  PORT: Joi.number().default(3000)
+  PORT: Joi.number().default(3000),
+  ENTITIES_LIMIT: Joi.number().default(10),
+  ENTITIES_SKIP: Joi.number().default(0)
 })

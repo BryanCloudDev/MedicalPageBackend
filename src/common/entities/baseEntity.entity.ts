@@ -11,12 +11,18 @@ export class BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    select: false
+  })
   createdOn: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    select: false
+  })
   updatedOn: Date
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({
+    select: false
+  })
   deletedOn: Date
 }

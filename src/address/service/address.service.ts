@@ -2,9 +2,13 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { CreateAddressDto } from '../dto/create-address.dto'
+import { UpdateAddressDto } from '../dto/update-address.dto'
+import { Country } from '../entities/country.entity'
 import { Address } from '../entities/address.entity'
-import { CountryService } from './country.service'
 import { exceptionHandler } from 'src/common/utils'
+import { CountryService } from './country.service'
+import { State } from '../entities/state.entity'
+import { City } from '../entities/city.entity'
 import { StateService } from './state.service'
 import { CityService } from './city.service'
 
@@ -34,17 +38,9 @@ export class AddressService {
         cityPromise
       ])
 
-      if (!country) {
-        throw new NotFoundException(`Country with ID ${countryId} not found`)
-      }
-
-      if (!state) {
-        throw new NotFoundException(`State with ID ${stateId} not found`)
-      }
-
-      if (!city) {
-        throw new NotFoundException(`City with ID ${cityId} not found`)
-      }
+      this.checkIfCountryExists(countryId, country)
+      this.checkIfStateExists(stateId, state)
+      this.checkIfCityExists(cityId, city)
 
       const addressInstance = this.addressRepository.create({
         ...partialAddress,
@@ -58,6 +54,68 @@ export class AddressService {
       return address
     } catch (error) {
       exceptionHandler(this.logger, error)
+    }
+  }
+
+  async updateById(id: string, updateAddressDto: UpdateAddressDto) {
+    try {
+      const { countryId, stateId, cityId, ...partialAddress } = updateAddressDto
+
+      const addressPromise = this.addressRepository.findOneBy({
+        id
+      })
+
+      const countryPromise = this.countryService.findById(countryId)
+      const statePromise = this.stateService.findById(stateId)
+      const cityPromise = this.cityService.findById(cityId)
+
+      const [address, country, state, city] = await Promise.all([
+        addressPromise,
+        countryPromise,
+        statePromise,
+        cityPromise
+      ])
+
+      this.checkIfCountryExists(countryId, country)
+      this.checkIfStateExists(stateId, state)
+      this.checkIfAddressExists(id, address)
+      this.checkIfCityExists(cityId, city)
+
+      await this.addressRepository.update(id, {
+        ...address,
+        ...partialAddress,
+        country,
+        state,
+        city
+      })
+
+      return
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  private checkIfAddressExists(id: string, address: Address | undefined) {
+    if (!address) {
+      throw new NotFoundException(`The address with ${id} was not found`)
+    }
+  }
+
+  private checkIfCityExists(id: string, city: City | undefined) {
+    if (!city) {
+      throw new NotFoundException(`City with ID ${id} not found`)
+    }
+  }
+
+  private checkIfStateExists(id: string, state: State | undefined) {
+    if (!state) {
+      throw new NotFoundException(`State with ID ${id} not found`)
+    }
+  }
+
+  private checkIfCountryExists(id: string, country: Country | undefined) {
+    if (!country) {
+      throw new NotFoundException(`Country with ID ${id} not found`)
     }
   }
 }
