@@ -10,7 +10,7 @@ import {
 } from 'class-validator'
 import { UpdateAddressDto } from 'src/address/dto/update-address.dto'
 import { IsLaterThan } from 'src/common/decorators'
-import { MobilePhoneDto } from 'src/patient/dto/mobilePhone.dto'
+import { MobilePhoneDto } from 'src/user/dto/mobilePhone.dto'
 
 export class UpdateUserDto {
   @IsString()
