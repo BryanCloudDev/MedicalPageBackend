@@ -1,8 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { PhoneCode } from '../entities/phone-code.entity'
 import { Country } from '../entities/country.entity'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class PhoneCodeService {
@@ -11,12 +12,39 @@ export class PhoneCodeService {
     private readonly phoneCodeRepository: Repository<PhoneCode>
   ) {}
 
-  create(code: string, country: Country): Promise<PhoneCode> {
-    const phoneCode = this.phoneCodeRepository.create({ code, country })
-    return this.phoneCodeRepository.save(phoneCode)
+  private readonly logger = new Logger(PhoneCodeService.name)
+
+  async create(code: string, country: Country): Promise<PhoneCode> {
+    try {
+      const phoneCodeInstance = this.phoneCodeRepository.create({
+        code,
+        country
+      })
+
+      const phoneCode = await this.phoneCodeRepository.save(phoneCodeInstance)
+      return phoneCode
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  findById(id: string): Promise<PhoneCode> {
-    return this.phoneCodeRepository.findOneBy({ id })
+  async findById(id: string): Promise<PhoneCode> {
+    try {
+      const phoneCode = await this.phoneCodeRepository.findOneBy({ id })
+
+      return phoneCode
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async getAll() {
+    try {
+      const phoneCodes = await this.phoneCodeRepository.find()
+
+      return phoneCodes
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 }

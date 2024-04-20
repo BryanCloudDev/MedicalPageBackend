@@ -17,11 +17,14 @@ import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
+import { SeedModule } from './seed/seed.module'
+import { JoiValidationSchema } from './config/joi.validation'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [envConfiguration]
+      load: [envConfiguration],
+      validationSchema: JoiValidationSchema
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -45,7 +48,8 @@ import { UserModule } from './user/user.module'
     ReviewsModule,
     SpecialtyModule,
     SponsorLevelModule,
-    UserModule
+    UserModule,
+    SeedModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { S3Service } from 'src/common/services/aws/s3.service'
 import { File, FileResponse } from 'src/common/types'
-import { errorHandler } from 'src/common/utils'
+import { exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class FileService {
@@ -13,7 +13,7 @@ export class FileService {
     try {
       return await this.s3Service.uploadFile(folder, file)
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -21,7 +21,7 @@ export class FileService {
     try {
       return await this.s3Service.getFile(folder, key)
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -29,7 +29,7 @@ export class FileService {
     try {
       return await this.s3Service.deleteFile(folder, key)
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 
@@ -37,7 +37,7 @@ export class FileService {
     try {
       return await this.s3Service.updateFile(folder, key, file)
     } catch (error) {
-      errorHandler(this.logger, error)
+      exceptionHandler(this.logger, error)
     }
   }
 }

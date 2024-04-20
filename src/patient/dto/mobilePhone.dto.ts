@@ -7,5 +7,5 @@ export class MobilePhoneDto {
   number: string
 
   @IsUUID()
-  areaCodeId: string
+  regionNumberId: string
 }

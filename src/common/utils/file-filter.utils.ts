@@ -1,11 +1,9 @@
-import { Request } from 'express'
-
 export const fileFilter = (
-  req: Request,
+  req: Express.Request,
   file: Express.Multer.File,
   callback: any
 ) => {
-  if (!file) return callback(null, false)
+  if (!file) return callback(new Error('File is empty'), false)
 
   const fileExtension = file.mimetype.split('/')[1]
   const validExtensions = ['jpg', 'jpeg', 'png', 'gif']

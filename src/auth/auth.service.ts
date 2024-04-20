@@ -1,6 +1,5 @@
 import {
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException
@@ -9,11 +8,12 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
 import { compareSync } from 'bcrypt'
-import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { AddressService, PhoneCodeService } from 'src/address/service'
+import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
+import { currentDate, exceptionHandler } from 'src/common/utils'
+import { PatientService } from 'src/patient/patient.service'
 import { User } from 'src/user/entities/user.entity'
 import { JwtPayload, Token } from './interfaces'
-import { currentDate } from 'src/common/utils'
 import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
 
@@ -23,6 +23,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
+    private readonly patientService: PatientService,
     private readonly addressService: AddressService,
     private readonly jwtService: JwtService
   ) {}
@@ -35,19 +36,17 @@ export class AuthService {
       mobilePhone,
       ...patientPartial
     } = createPatientDto
-    const { areaCodeId, number } = mobilePhone
-
-    const phoneCode = await this.phoneCodeService.findById(
-      mobilePhone.areaCodeId
-    )
-
-    if (!phoneCode) {
-      throw new NotFoundException(
-        `Phone code with id ${areaCodeId} was not found`
-      )
-    }
+    const { regionNumberId, number } = mobilePhone
 
     try {
+      const phoneCode = await this.phoneCodeService.findById(regionNumberId)
+
+      if (!phoneCode) {
+        throw new NotFoundException(
+          `Phone code with id ${regionNumberId} was not found`
+        )
+      }
+
       const address = await this.addressService.create(addressDto)
 
       const userInstance = this.userRepository.create({
@@ -59,35 +58,38 @@ export class AuthService {
         patient: {}
       })
 
-      return this.userRepository.save(userInstance)
+      const user = await this.userRepository.save(userInstance)
+
+      await this.patientService.create(user)
+
+      return {
+        token: this.getJwtToken({ id: user.id })
+      }
     } catch (error) {
-      this.logger.error(error)
-      throw new InternalServerErrorException('Check server logs')
+      exceptionHandler(this.logger, error)
     }
   }
 
   async loginUser({ password, email }: LoginUserDto): Promise<Token> {
-    let user: User
-
     try {
-      user = await this.userRepository.findOne({
+      const user = await this.userRepository.findOne({
         where: { email },
         select: { password: true, id: true }
       })
-    } catch (error) {}
 
-    if (!user || !compareSync(password, user.password)) {
-      throw new UnauthorizedException('Credentials are not valid')
-    }
+      if (!user || !compareSync(password, user.password)) {
+        throw new UnauthorizedException('Credentials are not valid')
+      }
 
-    const { id } = user
+      const { id } = user
 
-    try {
       await this.userRepository.update(id, { lastLoginOn: currentDate() })
-    } catch (error) {}
 
-    return {
-      token: this.getJwtToken({ id })
+      return {
+        token: this.getJwtToken({ id })
+      }
+    } catch (error) {
+      exceptionHandler(this.logger, error)
     }
   }
 
