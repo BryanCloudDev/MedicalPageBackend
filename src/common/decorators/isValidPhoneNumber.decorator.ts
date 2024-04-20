@@ -19,7 +19,7 @@ export class IsValidPhoneNumberConstraint
 
   defaultMessage({ value, constraints }: ValidationArguments) {
     if (value.length < 8 || value.length > 15)
-      return 'Number must be up to 15 characters long'
+      return 'Number must be between 8 and up to 15 characters long'
 
     const [type] = constraints
 
@@ -37,12 +37,13 @@ export class IsValidPhoneNumberConstraint
     return (
       isString(value) &&
       this.regexForPhoneNumber.test(value) &&
-      (value.length >= MIN_CHAR_AMOUNT || value.length <= MAX_CHAR_AMOUNT)
+      value.length >= MIN_CHAR_AMOUNT &&
+      value.length <= MAX_CHAR_AMOUNT
     )
   }
 }
 
-export function IsValidPhoneNumber(type: PhoneType) {
+export function IsValidPhoneNumber(type?: PhoneType) {
   return function (object: Record<string, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
