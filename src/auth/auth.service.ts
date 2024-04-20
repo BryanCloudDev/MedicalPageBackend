@@ -5,6 +5,7 @@ import {
   UnauthorizedException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { BadRequestException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
 import { compareSync } from 'bcrypt'
@@ -79,6 +80,12 @@ export class AuthService {
 
       if (!user || !compareSync(password, user.password)) {
         throw new UnauthorizedException('Credentials are not valid')
+      }
+
+      if (!user.isActive) {
+        throw new BadRequestException(
+          'User inactive or deleted, please contact the administrator'
+        )
       }
 
       const { id } = user
