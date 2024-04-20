@@ -75,7 +75,7 @@ export class AuthService {
     try {
       const user = await this.userRepository.findOne({
         where: { email },
-        select: { password: true, id: true }
+        select: { password: true, id: true, isActive: true }
       })
 
       if (!user || !compareSync(password, user.password)) {
