@@ -85,7 +85,9 @@ export class UserService {
       })
 
       // update address
-      await this.addressService.updateById(user.address.id, address)
+      if (address) {
+        await this.addressService.updateById(user.address.id, address)
+      }
 
       return
     } catch (error) {

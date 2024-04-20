@@ -40,11 +40,11 @@ export class AuthService {
     const { regionNumberId, number } = mobilePhone
 
     try {
-      const phoneCode = await this.phoneCodeService.findById(regionNumberId)
+      const regionNumber = await this.phoneCodeService.findById(regionNumberId)
 
-      if (!phoneCode) {
+      if (!regionNumber) {
         throw new NotFoundException(
-          `Phone code with id ${regionNumberId} was not found`
+          `Phone code with id ${regionNumber} was not found`
         )
       }
 
@@ -54,7 +54,7 @@ export class AuthService {
         ...patientPartial,
         mobilePhone: number,
         role: Roles.PATIENT,
-        phoneCode,
+        regionNumber,
         address,
         patient: {}
       })

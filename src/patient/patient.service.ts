@@ -21,13 +21,20 @@ export class PatientService {
 
   private readonly logger = new Logger(PatientService.name)
 
-  async uploadPhoto(file: Express.Multer.File, { id }: User) {
+  async uploadPhoto(file: Express.Multer.File, user: User) {
+    const { id } = user
     try {
       if (!file) throw new BadRequestException('File is required')
 
       const photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
 
-      await this.userService.updateById(id, { photo })
+      await this.userService.updateById(id, {
+        photo,
+        mobilePhone: {
+          number: user.mobilePhone,
+          regionNumberId: user.regionNumber.id
+        }
+      })
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
