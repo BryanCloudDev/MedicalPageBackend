@@ -5,6 +5,7 @@ import {
   UnauthorizedException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { BadRequestException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
 import { compareSync } from 'bcrypt'
@@ -39,11 +40,11 @@ export class AuthService {
     const { regionNumberId, number } = mobilePhone
 
     try {
-      const phoneCode = await this.phoneCodeService.findById(regionNumberId)
+      const regionNumber = await this.phoneCodeService.findById(regionNumberId)
 
-      if (!phoneCode) {
+      if (!regionNumber) {
         throw new NotFoundException(
-          `Phone code with id ${regionNumberId} was not found`
+          `Phone code with id ${regionNumber} was not found`
         )
       }
 
@@ -53,7 +54,7 @@ export class AuthService {
         ...patientPartial,
         mobilePhone: number,
         role: Roles.PATIENT,
-        phoneCode,
+        regionNumber,
         address,
         patient: {}
       })
@@ -74,11 +75,17 @@ export class AuthService {
     try {
       const user = await this.userRepository.findOne({
         where: { email },
-        select: { password: true, id: true }
+        select: { password: true, id: true, isActive: true }
       })
 
       if (!user || !compareSync(password, user.password)) {
         throw new UnauthorizedException('Credentials are not valid')
+      }
+
+      if (!user.isActive) {
+        throw new BadRequestException(
+          'User disabled, please contact the administrator'
+        )
       }
 
       const { id } = user

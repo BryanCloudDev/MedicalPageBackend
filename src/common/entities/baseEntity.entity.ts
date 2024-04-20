@@ -1,6 +1,6 @@
 import {
+  Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn
@@ -21,7 +21,9 @@ export class BaseEntity {
   })
   updatedOn: Date
 
-  @DeleteDateColumn({
+  @Column({
+    type: 'datetime',
+    default: null,
     select: false
   })
   deletedOn: Date

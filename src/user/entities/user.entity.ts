@@ -83,7 +83,7 @@ export class User extends BaseEntity {
   @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.user, {
     eager: true
   })
-  phoneCode?: PhoneCode
+  regionNumber?: PhoneCode
 
   private encrpytPassword() {
     this.password = bcrypt.hashSync(this.password, 10)

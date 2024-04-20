@@ -9,11 +9,11 @@ export class Country extends Item {
   @OneToMany(() => State, (state) => state.country)
   states: State[]
 
-  @OneToOne(() => PhoneCode, (phoneCode) => phoneCode.country, {
+  @OneToOne(() => PhoneCode, (regionNumber) => regionNumber.country, {
     nullable: true
   })
   @JoinColumn()
-  phoneCode: PhoneCode
+  regionNumber: PhoneCode
 
   @OneToMany(() => Address, (address) => address.country)
   address?: Address[]
