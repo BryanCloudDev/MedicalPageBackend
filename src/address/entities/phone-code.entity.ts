@@ -10,11 +10,11 @@ export class PhoneCode extends BaseEntity {
   })
   code: string
 
-  @OneToOne(() => Country, (country) => country.phoneCode, {
+  @OneToOne(() => Country, (country) => country.regionNumber, {
     nullable: false
   })
   country: Country
 
-  @OneToMany(() => User, (user) => user.phoneCode)
+  @OneToMany(() => User, (user) => user.regionNumber)
   user: User[]
 }
