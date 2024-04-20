@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException
+} from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
 import { ExtractJwt, Strategy } from 'passport-jwt'
@@ -32,8 +37,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       }
 
       if (!user.isActive) {
-        throw new UnauthorizedException(
-          'User is inactive, contact the administrator'
+        throw new BadRequestException(
+          'User disabled, please contact the administrator'
         )
       }
 

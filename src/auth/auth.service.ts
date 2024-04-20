@@ -84,7 +84,7 @@ export class AuthService {
 
       if (!user.isActive) {
         throw new BadRequestException(
-          'User inactive or deleted, please contact the administrator'
+          'User disabled, please contact the administrator'
         )
       }
 
