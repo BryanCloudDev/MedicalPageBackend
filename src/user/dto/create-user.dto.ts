@@ -11,7 +11,7 @@ import {
   IsDate,
   IsNotEmptyObject
 } from 'class-validator'
-import { CreateAddressDto } from 'src/address/dto/create-address.dto'
+import { CreateAddressDto } from 'src/address/dto/address/create-address.dto'
 import { IsLaterThan } from 'src/common/decorators'
 import { MobilePhoneDto } from 'src/patient/dto/mobilePhone.dto'
 
