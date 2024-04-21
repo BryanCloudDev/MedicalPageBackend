@@ -15,6 +15,7 @@ import {
 import { PhoneCodeController } from './controllers/phone-code.controller'
 import { ConfigModule } from '@nestjs/config'
 import { CountryController } from './controllers/country.controller'
+import { StateController } from './controllers/state.controller'
 
 @Module({
   imports: [
@@ -35,6 +36,6 @@ import { CountryController } from './controllers/country.controller'
     CountryService,
     StateService
   ],
-  controllers: [PhoneCodeController, CountryController]
+  controllers: [PhoneCodeController, CountryController, StateController]
 })
 export class AddressModule {}
