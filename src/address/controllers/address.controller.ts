@@ -14,10 +14,10 @@ import { CreateAddressDto } from '../dto/address/create-address.dto'
 import { AddressService } from '../service'
 import { PaginationDto } from 'src/common/dtos'
 import { UpdateAddressDto } from '../dto/address/update-address.dto'
-import { Auth } from 'src/auth/decorators'
-import { Roles } from 'src/user/enums'
+// import { Auth } from 'src/auth/decorators'
+// import { Roles } from 'src/user/enums'
 
-@Controller()
+@Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
   @Post()

@@ -1,14 +1,17 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Repository } from 'typeorm'
 import { CreateAddressDto } from '../dto/address/create-address.dto'
 import { UpdateAddressDto } from '../dto/address/update-address.dto'
-import { Country } from '../entities/country.entity'
 import { Address } from '../entities/address.entity'
-import { exceptionHandler } from 'src/common/utils'
+import { currentDate, exceptionHandler } from 'src/common/utils'
 import { CountryService } from './country.service'
-import { State } from '../entities/state.entity'
-import { City } from '../entities/city.entity'
 import { StateService } from './state.service'
 import { CityService } from './city.service'
 
@@ -18,11 +21,14 @@ export class AddressService {
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
     private readonly countryService: CountryService,
+    private readonly configService: ConfigService,
     private readonly stateService: StateService,
     private readonly cityService: CityService
   ) {}
 
   private readonly logger = new Logger(AddressService.name)
+  private readonly take = this.configService.get('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get('ENTITIES_SKIP')
 
   async create(createAddressDto: CreateAddressDto): Promise<Address> {
     try {
@@ -38,10 +44,6 @@ export class AddressService {
         cityPromise
       ])
 
-      this.checkIfCountryExists(countryId, country)
-      this.checkIfStateExists(stateId, state)
-      this.checkIfCityExists(cityId, city)
-
       const addressInstance = this.addressRepository.create({
         ...partialAddress,
         country,
@@ -52,6 +54,32 @@ export class AddressService {
       const address = await this.addressRepository.save(addressInstance)
 
       return address
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async findById(id: string): Promise<Address> {
+    try {
+      const address = await this.addressRepository.findOneBy({ id })
+
+      this.checkIfAddressExists(id, address)
+
+      if (address.deletedOn) {
+        throw new BadRequestException(`The address with id ${id} was deleted`)
+      }
+
+      return address
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async findAll(skip = this.skip, take = this.take, deleted = false) {
+    try {
+      const address = await this.addressRepository.find({ skip, take })
+
+      return deleted ? address : this.trasformResponse(address)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -76,11 +104,6 @@ export class AddressService {
         cityPromise
       ])
 
-      this.checkIfCountryExists(countryId, country)
-      this.checkIfStateExists(stateId, state)
-      this.checkIfAddressExists(id, address)
-      this.checkIfCityExists(cityId, city)
-
       await this.addressRepository.update(id, {
         ...address,
         ...partialAddress,
@@ -95,27 +118,31 @@ export class AddressService {
     }
   }
 
-  private checkIfAddressExists(id: string, address: Address | undefined) {
+  async deleteById(id: string): Promise<void> {
+    try {
+      await this.findById(id)
+
+      await this.addressRepository.update(id, {
+        deletedOn: currentDate()
+      })
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  private checkIfAddressExists(id: string, address: Address) {
     if (!address) {
-      throw new NotFoundException(`The address with ${id} was not found`)
+      throw new NotFoundException(`The address with id ${id} was not found`)
     }
   }
 
-  private checkIfCityExists(id: string, city: City | undefined) {
-    if (!city) {
-      throw new NotFoundException(`City with ID ${id} not found`)
-    }
-  }
+  private trasformResponse(addresses: Address[]) {
+    return addresses
+      .filter((address) => address.deletedOn === null)
+      .map((address) => {
+        delete address.deletedOn
 
-  private checkIfStateExists(id: string, state: State | undefined) {
-    if (!state) {
-      throw new NotFoundException(`State with ID ${id} not found`)
-    }
-  }
-
-  private checkIfCountryExists(id: string, country: Country | undefined) {
-    if (!country) {
-      throw new NotFoundException(`Country with ID ${id} not found`)
-    }
+        return address
+      })
   }
 }
