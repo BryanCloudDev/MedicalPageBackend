@@ -22,7 +22,7 @@ export class SponsorLevelController {
   constructor(private readonly sponsorLevelService: SponsorLevelService) {}
 
   @Post()
-  // @Auth(Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   create(@Body() createSponsorLevelDto: CreateSponsorLevelDto) {
     return this.sponsorLevelService.create(createSponsorLevelDto)
   }
@@ -34,23 +34,23 @@ export class SponsorLevelController {
 
   @Get(':id')
   findById(@Param('id') id: string) {
-    return this.sponsorLevelService.findOne(id)
+    return this.sponsorLevelService.findById(id)
   }
 
   @Patch(':id')
-  // @Auth(Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
     @Body() updateSponsorLevelDto: UpdateSponsorLevelDto
   ) {
-    return this.sponsorLevelService.update(id, updateSponsorLevelDto)
+    return this.sponsorLevelService.updateById(id, updateSponsorLevelDto)
   }
 
   @Delete(':id')
-  // @Auth(Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id') id: string) {
-    return this.sponsorLevelService.remove(id)
+    return this.sponsorLevelService.deleteById(id)
   }
 }
