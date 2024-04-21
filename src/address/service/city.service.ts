@@ -1,21 +1,36 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Injectable, Logger } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Repository } from 'typeorm'
-import { exceptionHandler } from 'src/common/utils'
-import { State } from '../entities/state.entity'
+import { currentDate, exceptionHandler } from 'src/common/utils'
 import { City } from '../entities/city.entity'
+import { CreateCityDto } from '../dto/city/create-city.dto'
+import { StateService } from './state.service'
+import { UpdateCityDto } from '../dto/city/update-city.dto'
 
 @Injectable()
 export class CityService {
   constructor(
     @InjectRepository(City)
-    private readonly cityRepository: Repository<City>
+    private readonly cityRepository: Repository<City>,
+    private readonly configService: ConfigService,
+    private readonly stateService: StateService
   ) {}
 
   private readonly logger = new Logger(CityService.name)
+  private readonly take = this.configService.get('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get('ENTITIES_SKIP')
 
-  async create(name: string, state: State): Promise<City> {
+  async create(createCityDto: CreateCityDto): Promise<City> {
     try {
+      const { name, stateId } = createCityDto
+      const state = await this.stateService.findById(stateId)
+
       const cityInstance = this.cityRepository.create({ name, state })
       const city = await this.cityRepository.save(cityInstance)
 
@@ -29,9 +44,63 @@ export class CityService {
     try {
       const city = await this.cityRepository.findOneBy({ id })
 
+      this.checkIfCityExists(id, city)
+
+      if (city.deletedOn) {
+        throw new BadRequestException(`The city with id ${id} was deleted`)
+      }
+
       return city
     } catch (error) {
       exceptionHandler(this.logger, error)
+    }
+  }
+
+  async findAll(skip = this.skip, take = this.take, deleted = false) {
+    try {
+      const cities = await this.cityRepository.find({ skip, take })
+
+      return deleted ? cities : this.trasformResponse(cities)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async updateById(id: string, updateCityDto: UpdateCityDto): Promise<void> {
+    try {
+      await this.findById(id)
+
+      await this.cityRepository.update(id, updateCityDto)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async deleteById(id: string): Promise<void> {
+    try {
+      await this.findById(id)
+
+      await this.cityRepository.update(id, {
+        deletedOn: currentDate()
+      })
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  private trasformResponse(cities: City[]) {
+    return cities
+      .filter((city) => city.deletedOn === null)
+      .map((city) => {
+        delete city.deletedOn
+
+        return city
+      })
+  }
+
+  private checkIfCityExists(id: string, country: City | undefined) {
+    if (!country) {
+      throw new NotFoundException(`The city with id ${id} was not found`)
     }
   }
 }
