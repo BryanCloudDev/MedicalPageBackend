@@ -12,10 +12,13 @@ import {
   PhoneCodeService,
   StateService
 } from './service'
+import { PhoneCodeController } from './controllers/phone-code.controller'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Address, Country, State, City, PhoneCode])
+    TypeOrmModule.forFeature([Address, Country, State, City, PhoneCode]),
+    ConfigModule
   ],
   providers: [
     AddressService,
@@ -30,6 +33,7 @@ import {
     CityService,
     CountryService,
     StateService
-  ]
+  ],
+  controllers: [PhoneCodeController]
 })
 export class AddressModule {}
