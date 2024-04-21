@@ -23,8 +23,7 @@ export class BaseEntity {
 
   @Column({
     type: 'datetime',
-    default: null,
-    select: false
+    default: null
   })
   deletedOn: Date
 }
