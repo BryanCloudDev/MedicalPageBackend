@@ -1,26 +1,118 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException
+} from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ConfigService } from '@nestjs/config'
+import { Repository } from 'typeorm'
+
 import { CreateSpecialtyDto } from './dto/create-specialty.dto'
 import { UpdateSpecialtyDto } from './dto/update-specialty.dto'
+import { Specialty } from './entities/specialty.entity'
+import { currentDate, exceptionHandler } from 'src/common/utils'
 
 @Injectable()
 export class SpecialtyService {
-  create(createSpecialtyDto: CreateSpecialtyDto) {
-    return 'This action adds a new specialty'
+  constructor(
+    @InjectRepository(Specialty)
+    private readonly specialtyRepository: Repository<Specialty>,
+    private readonly configService: ConfigService
+  ) {}
+
+  private readonly logger = new Logger(SpecialtyService.name)
+  private readonly take = this.configService.get('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get('ENTITIES_SKIP')
+
+  async create(createSpecialtyDto: CreateSpecialtyDto): Promise<Specialty> {
+    try {
+      const specialtyInstance = this.specialtyRepository.create({
+        ...createSpecialtyDto
+      })
+      const specialty = await this.specialtyRepository.save(specialtyInstance)
+
+      return specialty
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  findAll() {
-    return `This action returns all specialty`
+  async findAll(
+    skip = this.skip,
+    take = this.take,
+    deleted = false
+  ): Promise<Specialty[]> {
+    try {
+      const specialties = await this.specialtyRepository.find({
+        skip,
+        take
+      })
+
+      return deleted ? specialties : this.trasformResponse(specialties)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} specialty`
+  async findById(id: string): Promise<Specialty> {
+    try {
+      const specialty = await this.specialtyRepository.findOneBy({ id })
+
+      this.checkIfSpecialtyExists(id, specialty)
+
+      if (specialty.deletedOn) {
+        throw new BadRequestException(`The specialty with id ${id} was deleted`)
+      }
+
+      return specialty
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  update(id: number, updateSpecialtyDto: UpdateSpecialtyDto) {
-    return `This action updates a #${id} specialty`
+  async updateById(
+    id: string,
+    updateSpecialtyDto: UpdateSpecialtyDto
+  ): Promise<void> {
+    try {
+      await this.findById(id)
+
+      await this.specialtyRepository.update(id, updateSpecialtyDto)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} specialty`
+  async deleteById(id: string): Promise<void> {
+    try {
+      const specialty = await this.findById(id)
+
+      if (specialty.deletedOn) {
+        throw new BadRequestException(`Specialty is already inactive`)
+      }
+
+      await this.specialtyRepository.update(id, {
+        deletedOn: currentDate()
+      })
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  private checkIfSpecialtyExists(id: string, specialty: Specialty | undefined) {
+    if (!specialty) {
+      throw new NotFoundException(`The specialty with id ${id} was not found`)
+    }
+  }
+
+  private trasformResponse(specialties: Specialty[]) {
+    return specialties
+      .filter((specialty) => specialty.deletedOn === null)
+      .map((specialty) => {
+        delete specialty.deletedOn
+
+        return specialty
+      })
   }
 }
