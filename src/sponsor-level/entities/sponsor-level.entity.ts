@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { Doctor } from 'src/doctor/entities/doctor.entity'
 import { Item } from 'src/common/entities'
 
 @Entity({ name: 'sponsor_levels' })

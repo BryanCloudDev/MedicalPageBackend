@@ -5,7 +5,7 @@ import { CommonModule } from './common/common.module'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { envConfiguration } from './config/env.config'
-import { DoctorsModule } from './doctors/doctors.module'
+import { DoctorModule } from './doctor/doctor.module'
 import { PatientModule } from './patient/patient.module'
 import { AppointmentModule } from './appointment/appointment.module'
 import { SpecialtyModule } from './specialty/specialty.module'
@@ -41,7 +41,7 @@ import { JoiValidationSchema } from './config/joi.validation'
     AuthModule,
     ClinicModule,
     CommonModule,
-    DoctorsModule,
+    DoctorModule,
     FileModule,
     HospitalModule,
     PatientModule,
