@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, Logger } from '@nestjs/common'
 import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { AuthService } from './auth.service'
 import { LoginUserDto } from './dto'
@@ -7,6 +7,7 @@ import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto'
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  private logger = new Logger(AuthController.name)
 
   @Post('register/patient')
   registerPatient(@Body() createPatientDto: CreatePatientDto) {

@@ -10,7 +10,6 @@ import { Repository } from 'typeorm'
 import { currentDate, exceptionHandler } from 'src/common/utils'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { AddressService } from 'src/address/service'
-import { DbErrorCodes } from 'src/common/enums'
 import { User } from './entities/user.entity'
 import { Roles } from './enums'
 import { PhoneCode } from 'src/address/entities/phone-code.entity'
@@ -103,8 +102,6 @@ export class UserService {
   }
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
-    const { ...partialUser } = updateUserDto
-
     try {
       //update user
       const user = await this.findById(id)
@@ -115,11 +112,11 @@ export class UserService {
 
       return
     } catch (error) {
-      if (error.errno === DbErrorCodes.DUPLICATE_ENTRY) {
-        throw new BadRequestException(
-          `The email address ${partialUser.email} is in use`
-        )
-      }
+      // if (error.errno === DbErrorCodes.DUPLICATE_ENTRY) {
+      //   throw new BadRequestException(
+      //     `The email address ${partialUser.email} is in use`
+      //   )
+      // }
 
       exceptionHandler(this.logger, error)
     }
