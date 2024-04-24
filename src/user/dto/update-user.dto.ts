@@ -8,7 +8,7 @@ import {
   Length,
   ValidateNested
 } from 'class-validator'
-import { UpdateAddressDto } from 'src/address/dto/update-address.dto'
+import { UpdateAddressDto } from 'src/address/dto/address/update-address.dto'
 import { IsLaterThan } from 'src/common/decorators'
 import { MobilePhoneDto } from 'src/user/dto/mobilePhone.dto'
 
