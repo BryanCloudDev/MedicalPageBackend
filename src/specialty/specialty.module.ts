@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config'
 @Module({
   imports: [TypeOrmModule.forFeature([Specialty]), ConfigModule],
   controllers: [SpecialtyController],
-  providers: [SpecialtyService]
+  providers: [SpecialtyService],
+  exports: [SpecialtyService]
 })
 export class SpecialtyModule {}

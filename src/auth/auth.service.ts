@@ -17,6 +17,8 @@ import { User } from 'src/user/entities/user.entity'
 import { JwtPayload, Token } from './interfaces'
 import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
+import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto'
+import { DoctorService } from 'src/doctor/doctor.service'
 
 @Injectable()
 export class AuthService {
@@ -25,6 +27,7 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly patientService: PatientService,
+    private readonly doctorService: DoctorService,
     private readonly addressService: AddressService,
     private readonly jwtService: JwtService
   ) {}
@@ -34,10 +37,9 @@ export class AuthService {
   async registerPatient(createPatientDto: CreatePatientDto) {
     const {
       address: addressDto,
-      mobilePhone,
+      regionNumberId,
       ...patientPartial
     } = createPatientDto
-    const { regionNumberId, number } = mobilePhone
 
     try {
       const regionNumber = await this.phoneCodeService.findById(regionNumberId)
@@ -52,7 +54,6 @@ export class AuthService {
 
       const userInstance = this.userRepository.create({
         ...patientPartial,
-        mobilePhone: number,
         role: Roles.PATIENT,
         regionNumber,
         address,
@@ -62,6 +63,43 @@ export class AuthService {
       const user = await this.userRepository.save(userInstance)
 
       await this.patientService.create(user)
+
+      return {
+        token: this.getJwtToken({ id: user.id })
+      }
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async registerDoctor(createDoctorDto: CreateDoctorDto) {
+    const {
+      address: addressDto,
+      regionNumberId,
+      ...doctorPartial
+    } = createDoctorDto
+
+    try {
+      const regionNumber = await this.phoneCodeService.findById(regionNumberId)
+
+      if (!regionNumber) {
+        throw new NotFoundException(
+          `Phone code with id ${regionNumber} was not found`
+        )
+      }
+
+      const address = await this.addressService.create(addressDto)
+
+      const userInstance = this.userRepository.create({
+        ...doctorPartial,
+        role: Roles.DOCTOR,
+        regionNumber,
+        address
+      })
+
+      const user = await this.userRepository.save(userInstance)
+
+      await this.doctorService.create(user, createDoctorDto)
 
       return {
         token: this.getJwtToken({ id: user.id })
