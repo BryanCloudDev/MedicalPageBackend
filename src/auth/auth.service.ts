@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  UnauthorizedException
-} from '@nestjs/common'
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BadRequestException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
@@ -19,6 +14,7 @@ import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
 import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto'
 import { DoctorService } from 'src/doctor/doctor.service'
+import { SpecialtyService } from 'src/specialty/specialty.service'
 
 @Injectable()
 export class AuthService {
@@ -26,9 +22,10 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
+    private readonly specialtyService: SpecialtyService,
+    private readonly addressService: AddressService,
     private readonly patientService: PatientService,
     private readonly doctorService: DoctorService,
-    private readonly addressService: AddressService,
     private readonly jwtService: JwtService
   ) {}
 
@@ -44,20 +41,13 @@ export class AuthService {
     try {
       const regionNumber = await this.phoneCodeService.findById(regionNumberId)
 
-      if (!regionNumber) {
-        throw new NotFoundException(
-          `Phone code with id ${regionNumber} was not found`
-        )
-      }
-
       const address = await this.addressService.create(addressDto)
 
       const userInstance = this.userRepository.create({
         ...patientPartial,
         role: Roles.PATIENT,
         regionNumber,
-        address,
-        patient: {}
+        address
       })
 
       const user = await this.userRepository.save(userInstance)
@@ -76,19 +66,16 @@ export class AuthService {
     const {
       address: addressDto,
       regionNumberId,
+      specialtyId,
       ...doctorPartial
     } = createDoctorDto
 
     try {
       const regionNumber = await this.phoneCodeService.findById(regionNumberId)
 
-      if (!regionNumber) {
-        throw new NotFoundException(
-          `Phone code with id ${regionNumber} was not found`
-        )
-      }
-
       const address = await this.addressService.create(addressDto)
+
+      const specialty = await this.specialtyService.findById(specialtyId)
 
       const userInstance = this.userRepository.create({
         ...doctorPartial,
@@ -99,7 +86,7 @@ export class AuthService {
 
       const user = await this.userRepository.save(userInstance)
 
-      await this.doctorService.create(user, createDoctorDto)
+      await this.doctorService.create(user, specialty, createDoctorDto)
 
       return {
         token: this.getJwtToken({ id: user.id })

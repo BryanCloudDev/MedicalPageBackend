@@ -6,23 +6,24 @@ import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { exceptionHandler } from 'src/common/utils'
 import { User } from 'src/user/entities/user.entity'
-import { SpecialtyService } from 'src/specialty/specialty.service'
+import { Specialty } from 'src/specialty/entities/specialty.entity'
 
 @Injectable()
 export class DoctorService {
   constructor(
     @InjectRepository(Doctor)
-    private readonly doctorRepository: Repository<Doctor>,
-    private readonly specialtyService: SpecialtyService
+    private readonly doctorRepository: Repository<Doctor>
   ) {}
 
   private readonly logger = new Logger(DoctorService.name)
 
-  async create(user: User, createDoctorDto: CreateDoctorDto) {
-    const { jvpmNumber, specialtyId, officePhoneNumber } = createDoctorDto
+  async create(
+    user: User,
+    specialty: Specialty,
+    createDoctorDto: CreateDoctorDto
+  ) {
+    const { jvpmNumber, officePhoneNumber } = createDoctorDto
     try {
-      const specialty = await this.specialtyService.findById(specialtyId)
-
       const doctorInstance = this.doctorRepository.create({
         user,
         jvpmNumber,
