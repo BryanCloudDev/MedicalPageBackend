@@ -29,11 +29,7 @@ export class PatientService {
       const photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
 
       await this.userService.updateById(id, {
-        photo,
-        mobilePhone: {
-          number: user.mobilePhone,
-          regionNumberId: user.regionNumber.id
-        }
+        photo
       })
     } catch (error) {
       exceptionHandler(this.logger, error)

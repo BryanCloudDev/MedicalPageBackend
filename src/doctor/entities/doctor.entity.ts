@@ -20,7 +20,7 @@ export class Doctor extends BaseEntity {
   @Column('varchar', {
     nullable: true
   })
-  phone?: string
+  officePhoneNumber?: string
 
   @Column('varchar')
   jvpmNumber: string

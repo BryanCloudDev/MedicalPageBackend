@@ -1,5 +1,5 @@
 import { Entity, OneToMany } from 'typeorm'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { Doctor } from 'src/doctor/entities/doctor.entity'
 import { Clinic } from 'src/clinic/entities/clinic.entity'
 import { Item } from 'src/common/entities'
 
