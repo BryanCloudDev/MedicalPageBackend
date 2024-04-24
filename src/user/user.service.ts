@@ -13,6 +13,8 @@ import { AddressService } from 'src/address/service'
 import { DbErrorCodes } from 'src/common/enums'
 import { User } from './entities/user.entity'
 import { Roles } from './enums'
+import { PhoneCode } from 'src/address/entities/phone-code.entity'
+import { Address } from 'src/address/entities/address.entity'
 
 @Injectable()
 export class UserService {
@@ -27,9 +29,40 @@ export class UserService {
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
+  async create(
+    userPartial: Partial<User>,
+    regionNumber: PhoneCode,
+    address: Address,
+    role: Roles
+  ) {
+    const userInstance = this.userRepository.create({
+      ...userPartial,
+      role,
+      regionNumber,
+      address
+    })
+
+    const user = await this.userRepository.save(userInstance)
+
+    return user
+  }
+
   async findByEmail(email: string): Promise<User> {
     try {
       const patient = await this.userRepository.findOneBy({ email })
+      return patient
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async findByEmailWithPassword(email: string): Promise<User> {
+    try {
+      const patient = await this.userRepository.findOne({
+        where: { email },
+        select: { password: true, id: true, isActive: true }
+      })
+
       return patient
     } catch (error) {
       exceptionHandler(this.logger, error)
@@ -70,7 +103,7 @@ export class UserService {
   }
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
-    const { mobilePhone, address, ...partialUser } = updateUserDto
+    const { ...partialUser } = updateUserDto
 
     try {
       //update user
@@ -78,16 +111,7 @@ export class UserService {
 
       this.checkIfUserExists(id, user)
 
-      await this.userRepository.save({
-        ...user,
-        ...partialUser,
-        mobilePhone: mobilePhone.number
-      })
-
-      // update address
-      if (address) {
-        await this.addressService.updateById(user.address.id, address)
-      }
+      await this.userRepository.update(id, updateUserDto)
 
       return
     } catch (error) {

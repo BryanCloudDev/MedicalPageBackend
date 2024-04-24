@@ -1,31 +1,28 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
 import { BadRequestException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { Repository } from 'typeorm'
 import { compareSync } from 'bcrypt'
 import { AddressService, PhoneCodeService } from 'src/address/service'
 import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { currentDate, exceptionHandler } from 'src/common/utils'
 import { PatientService } from 'src/patient/patient.service'
-import { User } from 'src/user/entities/user.entity'
 import { JwtPayload, Token } from './interfaces'
 import { Roles } from 'src/user/enums'
 import { LoginUserDto } from './dto'
 import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto'
 import { DoctorService } from 'src/doctor/doctor.service'
 import { SpecialtyService } from 'src/specialty/specialty.service'
+import { UserService } from 'src/user/user.service'
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly specialtyService: SpecialtyService,
     private readonly addressService: AddressService,
     private readonly patientService: PatientService,
     private readonly doctorService: DoctorService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService
   ) {}
 
@@ -43,14 +40,12 @@ export class AuthService {
 
       const address = await this.addressService.create(addressDto)
 
-      const userInstance = this.userRepository.create({
-        ...patientPartial,
-        role: Roles.PATIENT,
+      const user = await this.userService.create(
+        patientPartial,
         regionNumber,
-        address
-      })
-
-      const user = await this.userRepository.save(userInstance)
+        address,
+        Roles.PATIENT
+      )
 
       await this.patientService.create(user)
 
@@ -77,14 +72,12 @@ export class AuthService {
 
       const specialty = await this.specialtyService.findById(specialtyId)
 
-      const userInstance = this.userRepository.create({
-        ...doctorPartial,
-        role: Roles.DOCTOR,
+      const user = await this.userService.create(
+        doctorPartial,
         regionNumber,
-        address
-      })
-
-      const user = await this.userRepository.save(userInstance)
+        address,
+        Roles.PATIENT
+      )
 
       await this.doctorService.create(user, specialty, createDoctorDto)
 
@@ -98,10 +91,7 @@ export class AuthService {
 
   async loginUser({ password, email }: LoginUserDto): Promise<Token> {
     try {
-      const user = await this.userRepository.findOne({
-        where: { email },
-        select: { password: true, id: true, isActive: true }
-      })
+      const user = await this.userService.findByEmailWithPassword(email)
 
       if (!user || !compareSync(password, user.password)) {
         throw new UnauthorizedException('Credentials are not valid')
@@ -115,7 +105,7 @@ export class AuthService {
 
       const { id } = user
 
-      await this.userRepository.update(id, { lastLoginOn: currentDate() })
+      await this.userService.updateById(id, { lastLoginOn: currentDate() })
 
       return {
         token: this.getJwtToken({ id })

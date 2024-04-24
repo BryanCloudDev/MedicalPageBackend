@@ -42,4 +42,6 @@ export class UpdateUserDto {
   @Type(() => UpdateAddressDto)
   @IsNotEmptyObject()
   address?: UpdateAddressDto
+
+  lastLoginOn?: Date
 }
