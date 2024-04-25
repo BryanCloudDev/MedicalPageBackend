@@ -7,13 +7,13 @@ import {
   Param,
   Delete
 } from '@nestjs/common'
-import { ReviewsService } from './reviews.service'
+import { ReviewService } from './review.service'
 import { CreateReviewDto } from './dto/create-review.dto'
 import { UpdateReviewDto } from './dto/update-review.dto'
 
-@Controller('reviews')
-export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+@Controller('review')
+export class ReviewController {
+  constructor(private readonly reviewsService: ReviewService) {}
 
   @Post()
   create(@Body() createReviewDto: CreateReviewDto) {

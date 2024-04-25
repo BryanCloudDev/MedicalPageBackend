@@ -11,7 +11,7 @@ import { HospitalDoctors } from 'src/hospital/entities/hospitalDoctor.entity'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
 import { ClinicDoctor } from 'src/clinic/entities/clinicDoctor.entity'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
-import { Review } from 'src/reviews/entities/review.entity'
+import { Review } from 'src/review/entities/review.entity'
 import { User } from 'src/user/entities/user.entity'
 import { BaseEntity } from 'src/common/entities'
 

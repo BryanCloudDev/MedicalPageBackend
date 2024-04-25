@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { Appointment } from 'src/appointment/entities/appointment.entity'
-import { Review } from 'src/reviews/entities/review.entity'
+import { Review } from 'src/review/entities/review.entity'
 import { User } from 'src/user/entities/user.entity'
 import { BaseEntity } from 'src/common/entities'
 
