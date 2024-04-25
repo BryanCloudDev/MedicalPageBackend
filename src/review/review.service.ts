@@ -3,7 +3,7 @@ import { CreateReviewDto } from './dto/create-review.dto'
 import { UpdateReviewDto } from './dto/update-review.dto'
 
 @Injectable()
-export class ReviewsService {
+export class ReviewService {
   create(createReviewDto: CreateReviewDto) {
     return 'This action adds a new review'
   }

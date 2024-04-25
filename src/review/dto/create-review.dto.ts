@@ -16,9 +16,6 @@ export class CreateReviewDto {
   @IsUUID()
   doctorId: string
 
-  @IsUUID()
-  patientId: string
-
   @IsInt()
   @Matches(/^(10|[1-9])$/, {
     message: 'rating must be between 1 and 10'

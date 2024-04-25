@@ -12,7 +12,7 @@ import { SpecialtyModule } from './specialty/specialty.module'
 import { AddressModule } from './address/address.module'
 import { HospitalModule } from './hospital/hospital.module'
 import { ClinicModule } from './clinic/clinic.module'
-import { ReviewsModule } from './reviews/reviews.module'
+import { ReviewModule } from './review/review.module'
 import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
 import { AuthModule } from './auth/auth.module'
@@ -45,7 +45,7 @@ import { JoiValidationSchema } from './config/joi.validation'
     FileModule,
     HospitalModule,
     PatientModule,
-    ReviewsModule,
+    ReviewModule,
     SpecialtyModule,
     SponsorLevelModule,
     UserModule,
