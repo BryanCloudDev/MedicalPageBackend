@@ -10,6 +10,8 @@ import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { FolderType } from 'src/file/enums/folder.enum'
 import { FileService } from 'src/file/file.service'
 import { UserService } from 'src/user/user.service'
+import { PaginationUserDto } from 'src/patient/dto'
+import { Roles } from 'src/user/enums'
 
 @Injectable()
 export class DoctorService {
@@ -59,29 +61,47 @@ export class DoctorService {
     }
   }
 
-  findAll() {
-    return `This action returns all doctors`
+  async findAll(filterDto: PaginationUserDto) {
+    try {
+      const { offset, limit } = filterDto
+
+      const doctors = await this.userService.findAll(
+        Roles.DOCTOR,
+        offset,
+        limit
+      )
+
+      return doctors.map((doctor) => this.getDoctorProfile(doctor))
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  findById(id: string) {
-    return `This action returns a #${id} doctor`
-  }
+  async findById(id: string) {
+    try {
+      const doctor = await this.userService.findById(id)
 
-  async findByEmail(email: string) {
-    return email
-    // const patient = await this.patientRepository.findOneBy({ email })
-    // return patient
-  }
-
-  updateById(id: string, updateDoctorDto: UpdateDoctorDto) {
-    return updateDoctorDto
-  }
-
-  deleteById(id: string) {
-    return `This action removes a #${id} doctor`
+      return doctor
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
   getDoctorProfile(user: User) {
+    delete user.patient
+
     return user
+  }
+
+  async updateById(id: string, updateDoctorDto: UpdateDoctorDto) {
+    await this.userService.updateById(id, updateDoctorDto)
+  }
+
+  async deleteById(id: string) {
+    try {
+      await this.userService.deleteById(id)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 }
