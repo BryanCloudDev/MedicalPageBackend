@@ -76,7 +76,7 @@ export class AuthService {
         doctorPartial,
         regionNumber,
         address,
-        Roles.PATIENT
+        Roles.DOCTOR
       )
 
       await this.doctorService.create(user, specialty, createDoctorDto)
