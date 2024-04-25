@@ -20,10 +20,10 @@ export class Doctor extends BaseEntity {
   @Column('varchar', {
     nullable: true
   })
-  phone?: string
+  officePhoneNumber?: string
 
   @Column('varchar')
-  medicalLicense: string
+  jvpmNumber: string
 
   @Column('bool', {
     default: false
@@ -59,7 +59,7 @@ export class Doctor extends BaseEntity {
   specialty: Specialty
 
   @ManyToOne(() => SponsorLevel, (sponsorLevel) => sponsorLevel.doctor, {
-    nullable: false
+    nullable: true
   })
   sponsorLevel: SponsorLevel
 }

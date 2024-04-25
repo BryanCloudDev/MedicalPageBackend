@@ -8,7 +8,8 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpCode,
-  HttpStatus
+  HttpStatus,
+  Query
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { UpdatePatientDto } from './dto/update-patient.dto'
@@ -17,6 +18,7 @@ import { Auth, GetUser } from 'src/auth/decorators'
 import { PatientService } from './patient.service'
 import { fileFilter } from 'src/common/utils'
 import { Roles } from 'src/user/enums'
+import { PaginationDto } from 'src/common/dtos'
 
 @Controller('patient')
 export class PatientController {
@@ -26,7 +28,7 @@ export class PatientController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseInterceptors(
     FileInterceptor('photo', {
-      fileFilter: fileFilter
+      fileFilter
     })
   )
   @Auth(Roles.PATIENT)
@@ -48,6 +50,11 @@ export class PatientController {
   @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR)
   findOne(@Param('id') id: string) {
     return this.patientService.findById(id)
+  }
+
+  @Get()
+  findAll(@Query() filterDto: PaginationDto) {
+    return this.patientService.findAll(filterDto)
   }
 
   @Patch()

@@ -7,13 +7,12 @@ import {
   MaxLength,
   Matches,
   ValidateNested,
-  IsOptional,
   IsDate,
-  IsNotEmptyObject
+  IsNotEmptyObject,
+  IsUUID
 } from 'class-validator'
 import { CreateAddressDto } from 'src/address/dto/address/create-address.dto'
-import { IsLaterThan } from 'src/common/decorators'
-import { MobilePhoneDto } from 'src/patient/dto/mobilePhone.dto'
+import { IsLaterThan, IsValidPhoneNumber } from 'src/common/decorators'
 
 export class CreateUserDto {
   @IsString()
@@ -35,10 +34,12 @@ export class CreateUserDto {
   })
   password: string
 
-  @ValidateNested({ each: true })
-  @IsOptional()
-  @Type(() => MobilePhoneDto)
-  mobilePhone?: MobilePhoneDto
+  @IsUUID()
+  regionNumberId: string
+
+  @IsString()
+  @IsValidPhoneNumber('mobilePhone')
+  mobilePhoneNumber?: string
 
   @IsDate()
   @IsLaterThan()

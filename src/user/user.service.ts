@@ -10,9 +10,10 @@ import { Repository } from 'typeorm'
 import { currentDate, exceptionHandler } from 'src/common/utils'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { AddressService } from 'src/address/service'
-import { DbErrorCodes } from 'src/common/enums'
 import { User } from './entities/user.entity'
 import { Roles } from './enums'
+import { PhoneCode } from 'src/address/entities/phone-code.entity'
+import { Address } from 'src/address/entities/address.entity'
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,24 @@ export class UserService {
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
+  async create(
+    userPartial: Partial<User>,
+    regionNumber: PhoneCode,
+    address: Address,
+    role: Roles
+  ) {
+    const userInstance = this.userRepository.create({
+      ...userPartial,
+      role,
+      regionNumber,
+      address
+    })
+
+    const user = await this.userRepository.save(userInstance)
+
+    return user
+  }
+
   async findByEmail(email: string): Promise<User> {
     try {
       const patient = await this.userRepository.findOneBy({ email })
@@ -36,11 +55,22 @@ export class UserService {
     }
   }
 
+  async findByEmailWithPassword(email: string): Promise<User> {
+    try {
+      const patient = await this.userRepository.findOne({
+        where: { email },
+        select: { password: true, id: true, isActive: true }
+      })
+
+      return patient
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
   async findById(id: string): Promise<User> {
     try {
       const user = await this.userRepository.findOneBy({ id })
-
-      this.logger.log(user)
 
       if (!user) {
         throw new NotFoundException(`User with id ${id} was not found`)
@@ -70,32 +100,21 @@ export class UserService {
   }
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
-    const { mobilePhone, address, ...partialUser } = updateUserDto
-
     try {
       //update user
       const user = await this.findById(id)
 
       this.checkIfUserExists(id, user)
 
-      await this.userRepository.save({
-        ...user,
-        ...partialUser,
-        mobilePhone: mobilePhone.number
-      })
-
-      // update address
-      if (address) {
-        await this.addressService.updateById(user.address.id, address)
-      }
+      await this.userRepository.update(id, updateUserDto)
 
       return
     } catch (error) {
-      if (error.errno === DbErrorCodes.DUPLICATE_ENTRY) {
-        throw new BadRequestException(
-          `The email address ${partialUser.email} is in use`
-        )
-      }
+      // if (error.errno === DbErrorCodes.DUPLICATE_ENTRY) {
+      //   throw new BadRequestException(
+      //     `The email address ${partialUser.email} is in use`
+      //   )
+      // }
 
       exceptionHandler(this.logger, error)
     }

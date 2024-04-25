@@ -9,6 +9,7 @@ import { FileService } from 'src/file/file.service'
 import { UserService } from 'src/user/user.service'
 import { exceptionHandler } from 'src/common/utils'
 import { PaginationUserDto } from './dto'
+import { Roles } from 'src/user/enums'
 
 @Injectable()
 export class PatientService {
@@ -29,11 +30,7 @@ export class PatientService {
       const photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
 
       await this.userService.updateById(id, {
-        photo,
-        mobilePhone: {
-          number: user.mobilePhone,
-          regionNumberId: user.regionNumber.id
-        }
+        photo
       })
     } catch (error) {
       exceptionHandler(this.logger, error)
@@ -53,9 +50,15 @@ export class PatientService {
 
   async findAll(filterDto: PaginationUserDto) {
     try {
-      const { offset, limit, role } = filterDto
+      const { offset, limit } = filterDto
 
-      return await this.userService.findAll(role, offset, limit)
+      const patients = await this.userService.findAll(
+        Roles.PATIENT,
+        offset,
+        limit
+      )
+
+      return patients.map((patient) => this.getPatientProfile(patient))
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -73,17 +76,12 @@ export class PatientService {
 
   getPatientProfile(user: User) {
     delete user.doctor
-    delete user.patient
 
     return user
   }
 
   async updateById(id: string, updatePatientDto: UpdatePatientDto) {
-    delete updatePatientDto.photo
-
-    const { ...partialUpdatePatientDto } = updatePatientDto
-
-    await this.userService.updateById(id, partialUpdatePatientDto)
+    await this.userService.updateById(id, updatePatientDto)
   }
 
   async deleteById(id: string) {

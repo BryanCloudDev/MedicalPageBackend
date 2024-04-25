@@ -9,7 +9,7 @@ import {
 import * as bcrypt from 'bcrypt'
 import { Roles } from '../enums'
 import { Patient } from 'src/patient/entities/patient.entity'
-import { Doctor } from 'src/doctors/entities/doctor.entity'
+import { Doctor } from 'src/doctor/entities/doctor.entity'
 import { PhoneCode } from 'src/address/entities/phone-code.entity'
 import { BaseEntity } from 'src/common/entities'
 import { Address } from 'src/address/entities/address.entity'
@@ -35,7 +35,7 @@ export class User extends BaseEntity {
   @Column('varchar', {
     nullable: true
   })
-  mobilePhone?: string
+  mobilePhoneNumber?: string
 
   @Column('varchar', {
     default: 'https://imgur.com/1Vr5Zsj',
