@@ -7,36 +7,45 @@ import {
   Param,
   Delete
 } from '@nestjs/common'
-import { ReviewService } from './review.service'
 import { CreateReviewDto } from './dto/create-review.dto'
 import { UpdateReviewDto } from './dto/update-review.dto'
+import { User } from 'src/user/entities/user.entity'
+import { Auth, GetUser } from 'src/auth/decorators'
+import { ReviewService } from './review.service'
+import { Roles } from 'src/user/enums'
 
 @Controller('review')
 export class ReviewController {
-  constructor(private readonly reviewsService: ReviewService) {}
+  constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto)
+  @Auth(Roles.PATIENT)
+  create(@Body() createReviewDto: CreateReviewDto, @GetUser() user: User) {
+    return this.reviewService.create(createReviewDto, user)
   }
 
   @Get()
   findAll() {
-    return this.reviewsService.findAll()
+    return this.reviewService.findAll()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id)
+  findById(@Param('id') id: string) {
+    return this.reviewService.findById(id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto)
+  @Auth(Roles.PATIENT, Roles.ADMINISTRATOR)
+  updateById(
+    @Param('id') id: string,
+    @Body() updateReviewDto: UpdateReviewDto
+  ) {
+    return this.reviewService.updateById(id, updateReviewDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id)
+  @Auth(Roles.PATIENT, Roles.ADMINISTRATOR)
+  deleteById(@Param('id') id: string) {
+    return this.reviewService.deleteById(id)
   }
 }
