@@ -26,7 +26,7 @@ export class PatientController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseInterceptors(
     FileInterceptor('photo', {
-      fileFilter: fileFilter
+      fileFilter
     })
   )
   @Auth(Roles.PATIENT)

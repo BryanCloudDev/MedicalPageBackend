@@ -63,7 +63,7 @@ export class DoctorService {
     return `This action returns all doctors`
   }
 
-  findOne(id: number) {
+  findById(id: string) {
     return `This action returns a #${id} doctor`
   }
 
@@ -73,11 +73,15 @@ export class DoctorService {
     // return patient
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
+  updateById(id: string, updateDoctorDto: UpdateDoctorDto) {
     return updateDoctorDto
   }
 
-  remove(id: number) {
+  deleteById(id: string) {
     return `This action removes a #${id} doctor`
+  }
+
+  getDoctorProfile(user: User) {
+    return user
   }
 }
