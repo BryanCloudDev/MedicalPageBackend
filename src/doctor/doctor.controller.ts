@@ -8,14 +8,16 @@ import {
   HttpCode,
   HttpStatus,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
+  Query
 } from '@nestjs/common'
-import { DoctorService } from './doctor.service'
 import { UpdateDoctorDto } from './dto/update-doctor.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { Auth, GetUser } from 'src/auth/decorators'
-import { fileFilter } from 'src/common/utils'
 import { User } from 'src/user/entities/user.entity'
+import { Auth, GetUser } from 'src/auth/decorators'
+import { DoctorService } from './doctor.service'
+import { PaginationDto } from 'src/common/dtos'
+import { fileFilter } from 'src/common/utils'
 import { Roles } from 'src/user/enums'
 
 @Controller('doctor')
@@ -45,8 +47,8 @@ export class DoctorsController {
   }
 
   @Get()
-  findAll() {
-    return this.doctorService.findAll()
+  findAll(@Query() filterDto: PaginationDto) {
+    return this.doctorService.findAll(filterDto)
   }
 
   @Get(':id')
