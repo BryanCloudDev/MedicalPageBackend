@@ -1,5 +1,4 @@
 import {
-  IsInt,
   IsNotEmpty,
   IsString,
   IsUUID,
@@ -16,7 +15,7 @@ export class CreateReviewDto {
   @IsUUID()
   doctorId: string
 
-  @IsInt()
+  @IsString()
   @Matches(/^(10|[1-9])$/, {
     message: 'rating must be between 1 and 10'
   })

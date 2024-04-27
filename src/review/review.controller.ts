@@ -5,7 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
 import { CreateReviewDto } from './dto/create-review.dto'
 import { UpdateReviewDto } from './dto/update-review.dto'
@@ -36,6 +38,7 @@ export class ReviewController {
 
   @Patch(':id')
   @Auth(Roles.PATIENT, Roles.ADMINISTRATOR)
+  @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
     @Body() updateReviewDto: UpdateReviewDto
@@ -45,6 +48,7 @@ export class ReviewController {
 
   @Delete(':id')
   @Auth(Roles.PATIENT, Roles.ADMINISTRATOR)
+  @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id') id: string) {
     return this.reviewService.deleteById(id)
   }
