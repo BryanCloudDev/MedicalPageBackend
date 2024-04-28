@@ -13,6 +13,11 @@ export class Appointment extends BaseEntity {
   })
   result?: string
 
+  @Column('varchar', {
+    default: 'CREATED'
+  })
+  status?: string
+
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments, {
     nullable: false
   })
