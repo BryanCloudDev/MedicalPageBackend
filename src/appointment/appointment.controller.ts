@@ -5,7 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
 import { AppointmentService } from './appointment.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
@@ -36,11 +38,12 @@ export class AppointmentController {
   @Get(':id')
   @Auth(Roles.ADMINISTRATOR)
   findOneById(@Param('id') id: string) {
-    return this.appointmentService.findOneById(id)
+    return this.appointmentService.findById(id)
   }
 
   @Patch(':id')
   @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto
@@ -50,6 +53,7 @@ export class AppointmentController {
 
   @Delete(':id')
   @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id') id: string) {
     return this.appointmentService.deleteById(id)
   }
