@@ -4,9 +4,13 @@ import { HospitalController } from './hospital.controller'
 import { HospitalDoctors } from './entities/hospitalDoctor.entity'
 import { Hospital } from './entities/hospital.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Hospital, HospitalDoctors])],
+  imports: [
+    TypeOrmModule.forFeature([Hospital, HospitalDoctors]),
+    ConfigModule
+  ],
   controllers: [HospitalController],
   providers: [HospitalService]
 })
