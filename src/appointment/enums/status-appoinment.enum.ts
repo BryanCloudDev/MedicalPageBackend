@@ -1,0 +1,6 @@
+export enum Status {
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  CREATED = 'CREATED',
+  NOT_ATTENDED = 'NOT ATTENDED'
+}
