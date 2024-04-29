@@ -9,7 +9,7 @@ import { CreateAddressDto } from 'src/address/dto/address/create-address.dto'
 
 export class CreateHospitalDto {
   @IsString()
-  @Length(3, 15)
+  @Length(3, 50)
   name: string
 
   @ValidateNested({ each: true })
