@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne } from 'typeorm'
 import { Patient } from 'src/patient/entities/patient.entity'
 import { Doctor } from 'src/doctor/entities/doctor.entity'
 import { BaseEntity } from 'src/common/entities'
+import { Status } from '../enums/status-appoinment.enum'
 
 @Entity({ name: 'appointments' })
 export class Appointment extends BaseEntity {
@@ -11,7 +12,12 @@ export class Appointment extends BaseEntity {
   @Column('text', {
     nullable: true
   })
-  result?: string
+  notes?: string
+
+  @Column('varchar', {
+    default: Status.CREATED
+  })
+  status?: string
 
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments, {
     nullable: false

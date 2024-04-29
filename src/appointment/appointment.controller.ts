@@ -5,41 +5,56 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
 import { AppointmentService } from './appointment.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
+import { Auth, GetUser } from 'src/auth/decorators'
+import { User } from 'src/user/entities/user.entity'
+import { Roles } from 'src/user/enums'
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentService.create(createAppointmentDto)
+  @Auth(Roles.PATIENT)
+  create(
+    @GetUser() user: User,
+    @Body() createAppointmentDto: CreateAppointmentDto
+  ) {
+    return this.appointmentService.create(createAppointmentDto, user)
   }
 
   @Get()
+  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
   findAll() {
     return this.appointmentService.findAll()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appointmentService.findOne(+id)
+  @Auth(Roles.ADMINISTRATOR)
+  findOneById(@Param('id') id: string) {
+    return this.appointmentService.findById(id)
   }
 
   @Patch(':id')
-  update(
+  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  updateById(
     @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto
   ) {
-    return this.appointmentService.update(+id, updateAppointmentDto)
+    return this.appointmentService.updateById(id, updateAppointmentDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.appointmentService.remove(+id)
+  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteById(@Param('id') id: string) {
+    return this.appointmentService.deleteById(id)
   }
 }
