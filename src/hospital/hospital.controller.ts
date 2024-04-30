@@ -5,7 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
 import { HospitalService } from './hospital.service'
 import { CreateHospitalDto } from './dto/create-hospital.dto'
@@ -35,6 +37,7 @@ export class HospitalController {
 
   @Patch(':id')
   @Auth(Roles.ADMINISTRATOR)
+  @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
     @Body() updateHospitalDto: UpdateHospitalDto
@@ -44,6 +47,7 @@ export class HospitalController {
 
   @Delete(':id')
   @Auth(Roles.ADMINISTRATOR)
+  @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id') id: string) {
     return this.hospitalService.deleteById(id)
   }

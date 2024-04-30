@@ -10,7 +10,6 @@ import { User } from 'src/user/entities/user.entity'
 import { Appointment } from './entities/appointment.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { SpecialtyService } from 'src/specialty/specialty.service'
 import { ConfigService } from '@nestjs/config'
 import { DoctorService } from 'src/doctor/doctor.service'
 import { exceptionHandler, currentDate } from 'src/common/utils'
@@ -24,7 +23,7 @@ export class AppointmentService {
     private readonly doctorService: DoctorService
   ) {}
 
-  private readonly logger = new Logger(SpecialtyService.name)
+  private readonly logger = new Logger(AppointmentService.name)
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
