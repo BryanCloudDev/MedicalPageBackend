@@ -2,6 +2,7 @@ import { Type } from 'class-transformer'
 import {
   IsNotEmptyObject,
   IsString,
+  IsUUID,
   Length,
   ValidateNested
 } from 'class-validator'
@@ -16,4 +17,7 @@ export class CreateHospitalDto {
   @Type(() => CreateAddressDto)
   @IsNotEmptyObject()
   address: CreateAddressDto
+
+  @IsUUID()
+  specialtyId: string
 }

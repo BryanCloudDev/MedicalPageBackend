@@ -12,6 +12,7 @@ import { Repository } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
 import { exceptionHandler, currentDate } from 'src/common/utils'
 import { AddressService } from 'src/address/service'
+import { SpecialtyService } from 'src/specialty/specialty.service'
 
 @Injectable()
 export class HospitalService {
@@ -19,22 +20,27 @@ export class HospitalService {
     @InjectRepository(Hospital)
     private readonly hospitalRepository: Repository<Hospital>,
     private readonly configService: ConfigService,
-    private readonly addressService: AddressService
+    private readonly addressService: AddressService,
+    private readonly specialtyService: SpecialtyService
   ) {}
 
   private readonly logger = new Logger(HospitalService.name)
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
-  async create(createHospitalDto: CreateHospitalDto) {
+  async create({
+    address: addressDto,
+    specialtyId,
+    ...createHospitalDto
+  }: CreateHospitalDto) {
     try {
-      const address = await this.addressService.create(
-        createHospitalDto.address
-      )
+      const address = await this.addressService.create(addressDto)
+      const specialty = await this.specialtyService.findById(specialtyId)
 
       const hospitalInstance = this.hospitalRepository.create({
-        ...createHospitalDto,
-        address
+        address,
+        specialty,
+        ...createHospitalDto
       })
 
       await this.hospitalRepository.save(hospitalInstance)

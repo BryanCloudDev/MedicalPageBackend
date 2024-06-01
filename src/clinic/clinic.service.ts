@@ -12,6 +12,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { AddressService } from 'src/address/service'
 import { exceptionHandler, currentDate } from 'src/common/utils'
 import { Repository } from 'typeorm'
+import { SpecialtyService } from 'src/specialty/specialty.service'
+import { Specialty } from 'src/specialty/entities/specialty.entity'
 
 @Injectable()
 export class ClinicService {
@@ -19,20 +21,27 @@ export class ClinicService {
     @InjectRepository(Clinic)
     private readonly clinicRepository: Repository<Clinic>,
     private readonly configService: ConfigService,
-    private readonly addressService: AddressService
+    private readonly addressService: AddressService,
+    private readonly specialtyService: SpecialtyService
   ) {}
 
   private readonly logger = new Logger(ClinicService.name)
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
-  async create(createClinicDto: CreateClinicDto) {
+  async create({
+    address: addressDto,
+    specialtyId,
+    ...createClinicDto
+  }: CreateClinicDto) {
     try {
-      const address = await this.addressService.create(createClinicDto.address)
+      const address = await this.addressService.create(addressDto)
+      const specialty = await this.specialtyService.findById(specialtyId)
 
       const clinicInstance = this.clinicRepository.create({
-        ...createClinicDto,
-        address
+        address,
+        specialty,
+        ...createClinicDto
       })
 
       await this.clinicRepository.save(clinicInstance)
@@ -70,13 +79,25 @@ export class ClinicService {
     }
   }
 
-  async updateById(id: string, updateClinicDto: UpdateClinicDto) {
+  async updateById(
+    id: string,
+    { name, specialtyId, ...updateClinicDto }: UpdateClinicDto
+  ) {
     try {
       delete updateClinicDto.address
 
+      const partialAddress: { name: string; specialty?: Specialty } = {
+        name
+      }
+
       await this.findById(id)
 
-      await this.clinicRepository.update(id, updateClinicDto)
+      if (specialtyId) {
+        const specialty = await this.specialtyService.findById(specialtyId)
+        partialAddress.specialty = specialty
+      }
+
+      await this.clinicRepository.update(id, partialAddress)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -96,7 +117,7 @@ export class ClinicService {
 
   private checkIfClinicExists(id: string, specialty: Clinic | undefined) {
     if (!specialty) {
-      throw new NotFoundException(`The hospital with id ${id} was not found`)
+      throw new NotFoundException(`The clinic with id ${id} was not found`)
     }
   }
 

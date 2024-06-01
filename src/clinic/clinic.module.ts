@@ -6,12 +6,14 @@ import { ClinicService } from './clinic.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { AddressModule } from 'src/address/address.module'
+import { SpecialtyModule } from 'src/specialty/specialty.module'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Clinic, ClinicDoctor]),
     ConfigModule,
-    AddressModule
+    AddressModule,
+    SpecialtyModule
   ],
   controllers: [ClinicController],
   providers: [ClinicService]
