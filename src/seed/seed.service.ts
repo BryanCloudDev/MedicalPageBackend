@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { elSalvadorDb } from 'src/address/el-salvador-cities-departments'
+import { elSalvadorDb } from 'src/seed/el-salvador-cities-departments'
 import { City } from 'src/address/entities/city.entity'
 import {
   CountryService,
@@ -22,33 +22,46 @@ export class SeedService {
 
   // run seed for ES data
   async runSeed() {
-    // try {
-    //   const states = new Set(elSalvadorDb.map((city) => city.state)).keys()
+    try {
+      const states = new Set(elSalvadorDb.map((city) => city.state)).keys()
 
-    //   const country = await this.countryService.create('El Salvador')
+      const country = await this.countryService.create({
+        name: 'El Salvador'
+      })
 
-    //   await this.phoneCodeService.create('+503', country)
+      await this.phoneCodeService.create({
+        code: '+503'
+      })
 
-    //   const citiesItems: Promise<City>[] = []
+      const citiesItems: Promise<City>[] = []
 
-    //   for (const state of states) {
-    //     const stateToBeCreated = await this.stateService.create(state, country)
-    //     const citiesPerState = elSalvadorDb.filter(
-    //       (city) => city.state === state
-    //     )
-    //     for (const city of citiesPerState) {
-    //       citiesItems.push(this.cityService.create(city.city, stateToBeCreated))
-    //     }
-    //   }
+      for (const state of states) {
+        const stateToBeCreated = await this.stateService.create({
+          name: state,
+          countryId: country.id
+        })
 
-    //   await Promise.all(citiesItems)
+        const citiesPerState = elSalvadorDb.filter(
+          (city) => city.state === state
+        )
+        for (const city of citiesPerState) {
+          citiesItems.push(
+            this.cityService.create({
+              name: city.city,
+              stateId: stateToBeCreated.id
+            })
+          )
+        }
+      }
 
-    //   return {
-    //     countries: await this.countryService.getAll(),
-    //     phoneCodes: await this.phoneCodeService.getAll()
-    //   }
-    // } catch (error) {
-    //   exceptionHandler(this.logger, error)
-    // }
+      await Promise.all(citiesItems)
+
+      return {
+        countries: await this.countryService.findAll(),
+        phoneCodes: await this.phoneCodeService.getAll()
+      }
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 }
