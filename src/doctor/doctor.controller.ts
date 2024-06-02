@@ -39,6 +39,9 @@ export class DoctorsController {
 
   @Patch('upload/profile-photo')
   @GenericResponses({ auth: true })
+  @ApiNoContentResponse({
+    description: 'No content'
+  })
   @ApiOperation({
     summary: 'Upload a photo for the doctor',
     description: Description.doctor

@@ -15,7 +15,15 @@ import { CreateHospitalDto } from './dto/create-hospital.dto'
 import { UpdateHospitalDto } from './dto/update-hospital.dto'
 import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
-import { ApiCreatedResponse, ApiExtraModels, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
 import { HospitalResponse } from 'src/common/swagger/classes/hospital.class'
