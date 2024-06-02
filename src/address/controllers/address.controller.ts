@@ -15,72 +15,45 @@ import { UpdateAddressDto } from '../dto/address/update-address.dto'
 import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
-  ApiBadRequestResponse,
-  ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse
+  ApiTags
 } from '@nestjs/swagger'
 import { Description } from 'src/common/swagger/description.swagger'
 import { AddressResponse } from 'src/common/swagger/classes/address.class'
+import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 
-@ApiTags('address')
+@ApiTags('Address')
 @Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @Get()
+  @GenericResponses({ auth: true })
   @ApiOkResponse({
-    description: 'The records has been successfully retrieved.',
     type: [AddressResponse]
   })
-  @ApiBadRequestResponse({
-    description: 'Bad Request'
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized'
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden'
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error'
-  })
   @ApiOperation({
-    summary: 'Get all addresses',
+    summary: 'Find all addresses',
     description: Description.administrator
   })
-  // @Auth(Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   findAll(@Query() query: PaginationDto) {
     return this.addressService.findAll()
   }
 
   @Get(':id')
-  @ApiOkResponse({
-    description: 'The records has been successfully retrieved.',
-    type: AddressResponse
-  })
+  @GenericResponses({ auth: true })
   @ApiNotFoundResponse({
     description: 'Not Found'
   })
-  @ApiBadRequestResponse({
-    description: 'Bad Request'
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized'
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden'
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error'
+  @ApiOkResponse({
+    type: AddressResponse
   })
   @ApiOperation({
-    summary: 'Get address by id',
+    summary: 'Find address by id',
     description: Description.getPatientAndDoctor()
   })
   @Auth(Roles.PATIENT, Roles.DOCTOR)
@@ -89,23 +62,12 @@ export class AddressController {
   }
 
   @Patch(':id')
+  @GenericResponses({ auth: true })
   @ApiNoContentResponse({
     description: 'No content'
   })
   @ApiNotFoundResponse({
     description: 'Not Found'
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad Request'
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized'
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden'
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error'
   })
   @ApiOperation({
     summary: 'Update address by id',
@@ -121,23 +83,12 @@ export class AddressController {
   }
 
   @Delete(':id')
+  @GenericResponses({ auth: true })
   @ApiNoContentResponse({
     description: 'No content'
   })
   @ApiNotFoundResponse({
     description: 'Not Found'
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad Request'
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized'
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden'
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error'
   })
   @ApiOperation({
     summary: 'Delete address by id',

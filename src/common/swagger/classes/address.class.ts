@@ -1,10 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-  IAddressResponse,
-  IItemResponse
-} from '../interfaces/address.interface'
 
-export class CountryResponse implements IItemResponse {
+export class CountryResponse {
   @ApiProperty({ example: '2f2da446-face-4864-9a36-a2e66eadc816' })
   id: string
 
@@ -15,7 +11,7 @@ export class CountryResponse implements IItemResponse {
   name: string
 }
 
-export class StateResponse implements IItemResponse {
+export class StateResponse {
   @ApiProperty({ example: '2f2da446-face-4864-9a36-a2e66eadc816' })
   id: string
 
@@ -26,7 +22,7 @@ export class StateResponse implements IItemResponse {
   name: string
 }
 
-export class CityResponse implements IItemResponse {
+export class CityResponse {
   @ApiProperty({ example: '2f2da446-face-4864-9a36-a2e66eadc816' })
   id: string
 
@@ -37,7 +33,7 @@ export class CityResponse implements IItemResponse {
   name: string
 }
 
-export class AddressResponse implements IAddressResponse {
+export class AddressResponse {
   @ApiProperty({ example: 'd1cf9413-bfcb-4bb7-9fff-6bd57da36fe4' })
   id: string
 
