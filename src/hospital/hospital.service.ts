@@ -25,8 +25,8 @@ export class HospitalService {
   ) {}
 
   private readonly logger = new Logger(HospitalService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create({
     address: addressDto,
@@ -49,7 +49,7 @@ export class HospitalService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
+  async findAll(take = this.take, skip = this.skip, deleted = false) {
     try {
       const hospitals = await this.hospitalRepository.find({
         skip,
