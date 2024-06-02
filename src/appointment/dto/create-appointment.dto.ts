@@ -3,7 +3,11 @@ import { Type } from 'class-transformer'
 import { IsDate, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class CreateAppointmentDto {
-  @ApiProperty({ type: Date, example: '2024-06-30T09:00:00.000Z' })
+  @ApiProperty({
+    type: Date,
+    example: '2024-06-30T09:00:00.000Z',
+    description: 'Appointment date'
+  })
   @IsDate()
   @Type(() => Date)
   appointmentDate: Date
@@ -11,7 +15,8 @@ export class CreateAppointmentDto {
   @ApiProperty({
     type: String,
     required: false,
-    example: 'Bring your medical reports'
+    example: 'Bring your medical reports',
+    description: 'Appointment notes'
   })
   @IsString()
   @IsOptional()
@@ -19,7 +24,8 @@ export class CreateAppointmentDto {
 
   @ApiProperty({
     type: String,
-    example: 'f09fdcc9-0d71-402b-af5a-0b5f60793cb0'
+    example: 'f09fdcc9-0d71-402b-af5a-0b5f60793cb0',
+    description: 'Doctor ID'
   })
   @IsUUID()
   doctorId: string
