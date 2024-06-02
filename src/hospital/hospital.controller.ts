@@ -43,7 +43,7 @@ export class HospitalController {
     summary: 'Create a hospital',
     description: Description.administrator
   })
-  // @Auth(Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   create(@Body() createHospitalDto: CreateHospitalDto) {
     return this.hospitalService.create(createHospitalDto)
   }
