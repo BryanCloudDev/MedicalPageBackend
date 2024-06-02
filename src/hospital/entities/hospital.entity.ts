@@ -1,7 +1,8 @@
-import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
+import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { Address } from 'src/address/entities/address.entity'
 import { HospitalDoctors } from './hospitalDoctor.entity'
 import { Item } from 'src/common/entities'
+import { Specialty } from 'src/specialty/entities/specialty.entity'
 
 @Entity({ name: 'hospitals' })
 export class Hospital extends Item {
@@ -10,6 +11,11 @@ export class Hospital extends Item {
   })
   @JoinColumn()
   address: Address
+
+  @ManyToOne(() => Specialty, (specialty) => specialty.clinics, {
+    nullable: false
+  })
+  specialty: Specialty
 
   @OneToMany(
     () => HospitalDoctors,

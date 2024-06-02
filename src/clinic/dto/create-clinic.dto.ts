@@ -3,7 +3,8 @@ import {
   IsString,
   Length,
   ValidateNested,
-  IsNotEmptyObject
+  IsNotEmptyObject,
+  IsUUID
 } from 'class-validator'
 import { CreateAddressDto } from 'src/address/dto/address/create-address.dto'
 
@@ -16,4 +17,7 @@ export class CreateClinicDto {
   @Type(() => CreateAddressDto)
   @IsNotEmptyObject()
   address: CreateAddressDto
+
+  @IsUUID()
+  specialtyId: string
 }
