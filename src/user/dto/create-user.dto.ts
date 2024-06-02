@@ -18,7 +18,7 @@ import { IsLaterThan, IsValidPhoneNumber } from 'src/common/decorators'
 export class CreateUserDto {
   @ApiProperty({
     example: 'John',
-    description: 'Patient first name',
+    description: 'User first name',
     minimum: 3,
     maximum: 15
   })
@@ -28,7 +28,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: 'Doe',
-    description: 'Patient last name',
+    description: 'User last name',
     minimum: 3,
     maximum: 15
   })
@@ -36,13 +36,13 @@ export class CreateUserDto {
   @Length(3, 15)
   lastName: string
 
-  @ApiProperty({ example: 'email@gmail.com', description: 'Patient email' })
+  @ApiProperty({ example: 'email@gmail.com', description: 'User email' })
   @IsEmail()
   email: string
 
   @ApiProperty({
     example: 'P455W0RD!23',
-    description: 'Patient password',
+    description: 'User password',
     minimum: 6,
     maximum: 50
   })
@@ -63,7 +63,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: '70707070',
-    description: 'Patient mobile phone number'
+    description: 'User mobile phone number'
   })
   @IsString()
   @IsValidPhoneNumber('mobilePhone')
@@ -72,14 +72,14 @@ export class CreateUserDto {
   @ApiProperty({
     type: Date,
     example: '2021-02-01T12:00:00.000Z',
-    description: 'Patient birth date'
+    description: 'User birth date'
   })
   @IsLaterThan()
   @IsDate()
   @Type(() => Date)
   birthDate: Date
 
-  @ApiProperty({ type: CreateAddressDto, description: 'Patient address' })
+  @ApiProperty({ type: CreateAddressDto, description: 'User address' })
   @ValidateNested({ each: true })
   @Type(() => CreateAddressDto)
   @IsNotEmptyObject()
