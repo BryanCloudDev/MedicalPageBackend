@@ -3,7 +3,8 @@ import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
-  ApiInternalServerErrorResponse
+  ApiInternalServerErrorResponse,
+  ApiBearerAuth
 } from '@nestjs/swagger'
 
 interface authOptions {
@@ -19,7 +20,8 @@ export function GenericResponses({ auth }: authOptions = { auth: false }) {
   if (auth) {
     decorators.push(
       ApiUnauthorizedResponse({ description: 'Unauthorized' }),
-      ApiForbiddenResponse({ description: 'Forbidden' })
+      ApiForbiddenResponse({ description: 'Forbidden' }),
+      ApiBearerAuth()
     )
   }
 
