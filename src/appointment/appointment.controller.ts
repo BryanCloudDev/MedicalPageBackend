@@ -53,6 +53,7 @@ export class AppointmentController {
   @Get()
   @GenericResponses({ auth: true })
   @ApiOkResponse({
+    description: 'Success',
     type: [AppointmentResponse]
   })
   @ApiOperation({
