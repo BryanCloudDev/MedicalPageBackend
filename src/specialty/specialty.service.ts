@@ -25,14 +25,12 @@ export class SpecialtyService {
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
-  async create(createSpecialtyDto: CreateSpecialtyDto): Promise<Specialty> {
+  async create(createSpecialtyDto: CreateSpecialtyDto): Promise<void> {
     try {
       const specialtyInstance = this.specialtyRepository.create({
         ...createSpecialtyDto
       })
-      const specialty = await this.specialtyRepository.save(specialtyInstance)
-
-      return specialty
+      await this.specialtyRepository.save(specialtyInstance)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
