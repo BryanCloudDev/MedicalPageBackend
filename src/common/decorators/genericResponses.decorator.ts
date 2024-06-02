@@ -6,7 +6,11 @@ import {
   ApiInternalServerErrorResponse
 } from '@nestjs/swagger'
 
-export function GenericResponses({ auth }: { auth?: boolean }) {
+interface authOptions {
+  auth?: boolean
+}
+
+export function GenericResponses({ auth }: authOptions = { auth: false }) {
   const decorators = [
     ApiBadRequestResponse({ description: 'Bad Request' }),
     ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
