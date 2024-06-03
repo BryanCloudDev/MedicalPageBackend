@@ -68,6 +68,7 @@ export class HospitalController {
     description: 'Not Found'
   })
   @ApiOkResponse({
+    description: 'Success',
     type: HospitalResponse
   })
   @ApiOperation({
