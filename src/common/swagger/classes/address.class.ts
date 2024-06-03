@@ -52,3 +52,11 @@ export class AddressResponse {
   @ApiProperty({ type: StateResponse })
   state: StateResponse
 }
+
+export class PhoneCodeResponse {
+  @ApiProperty({ example: 'd1cf9413-bfcb-4bb7-9fff-6bd57da36fe4' })
+  id: string
+
+  @ApiProperty({ example: '+503' })
+  code: string
+}
