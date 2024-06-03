@@ -4,7 +4,8 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
-  ApiBearerAuth
+  ApiBearerAuth,
+  ApiTooManyRequestsResponse
 } from '@nestjs/swagger'
 
 interface authOptions {
@@ -14,7 +15,10 @@ interface authOptions {
 export function GenericResponses({ auth }: authOptions = { auth: false }) {
   const decorators = [
     ApiBadRequestResponse({ description: 'Bad Request' }),
-    ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+    ApiInternalServerErrorResponse({ description: 'Internal Server Error' }),
+    ApiTooManyRequestsResponse({
+      description: 'Too many requests, please try again later'
+    })
   ]
 
   if (auth) {
