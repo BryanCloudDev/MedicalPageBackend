@@ -39,10 +39,8 @@ export class AppointmentService {
         patient,
         doctor
       })
-      const appointment =
-        await this.appointmentRepository.save(appointmentInstance)
 
-      return appointment
+      await this.appointmentRepository.save(appointmentInstance)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

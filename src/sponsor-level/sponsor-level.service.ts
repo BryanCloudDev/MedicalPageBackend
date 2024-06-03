@@ -30,10 +30,7 @@ export class SponsorLevelService {
         ...createSponsorLevelDto
       })
 
-      const sponsorLevel =
-        await this.sponsorLevelRepository.save(sponsorLevelInstance)
-
-      return sponsorLevel
+      await this.sponsorLevelRepository.save(sponsorLevelInstance)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

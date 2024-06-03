@@ -7,39 +7,73 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Post,
   Query
 } from '@nestjs/common'
-import { CreateAddressDto } from '../dto/address/create-address.dto'
 import { AddressService } from '../service'
 import { PaginationDto } from 'src/common/dtos'
 import { UpdateAddressDto } from '../dto/address/update-address.dto'
-// import { Auth } from 'src/auth/decorators'
-// import { Roles } from 'src/user/enums'
+import { Auth } from 'src/auth/decorators'
+import { Roles } from 'src/user/enums'
+import {
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger'
+import { Description } from 'src/common/swagger/description.swagger'
+import { AddressResponse } from 'src/common/swagger/classes/address.class'
+import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 
+@ApiTags('Address')
 @Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
-  @Post()
-  // @Auth(Roles.PATIENT, Roles.DOCTOR)
-  create(@Body() createAddressDto: CreateAddressDto) {
-    return this.addressService.create(createAddressDto)
-  }
 
   @Get()
-  // @Auth(Roles.ADMINISTRATOR)
+  @GenericResponses({ auth: true })
+  @ApiOkResponse({
+    type: [AddressResponse]
+  })
+  @ApiOperation({
+    summary: 'Find all addresses',
+    description: Description.administrator
+  })
+  @Auth(Roles.ADMINISTRATOR)
   findAll(@Query() query: PaginationDto) {
     return this.addressService.findAll()
   }
 
   @Get(':id')
-  // @Auth(Roles.PATIENT, Roles.DOCTOR)
+  @GenericResponses({ auth: true })
+  @ApiNotFoundResponse({
+    description: 'Not Found'
+  })
+  @ApiOkResponse({
+    type: AddressResponse
+  })
+  @ApiOperation({
+    summary: 'Find address by id',
+    description: Description.getPatientAndDoctor()
+  })
+  @Auth(Roles.PATIENT, Roles.DOCTOR)
   findById(@Param('id') id: string) {
     return this.addressService.findById(id)
   }
 
   @Patch(':id')
-  // @Auth(Roles.PATIENT, Roles.DOCTOR, Roles.ADMINISTRATOR)
+  @GenericResponses({ auth: true })
+  @ApiNoContentResponse({
+    description: 'No content'
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found'
+  })
+  @ApiOperation({
+    summary: 'Update address by id',
+    description: Description.getDoctorPatientAndAdministrator()
+  })
+  @Auth(Roles.PATIENT, Roles.DOCTOR, Roles.ADMINISTRATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
@@ -49,7 +83,18 @@ export class AddressController {
   }
 
   @Delete(':id')
-  // @Auth(Roles.ADMINISTRATOR)
+  @GenericResponses({ auth: true })
+  @ApiNoContentResponse({
+    description: 'No content'
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found'
+  })
+  @ApiOperation({
+    summary: 'Delete address by id',
+    description: Description.administrator
+  })
+  @Auth(Roles.ADMINISTRATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id') id: string) {
     return this.addressService.deleteById(id)
