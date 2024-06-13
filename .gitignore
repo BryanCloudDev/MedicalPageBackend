@@ -1,6 +1,5 @@
 # compiled output
-/dist
-/node_modules
+dist
 
 # Logs
 logs
@@ -35,3 +34,4 @@ mysql/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+node_modules
