@@ -19,6 +19,8 @@ import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
 import { SeedModule } from './seed/seed.module'
 import { JoiValidationSchema } from './config/joi.validation'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -36,6 +38,14 @@ import { JoiValidationSchema } from './config/joi.validation'
       autoLoadEntities: true,
       synchronize: true
     }),
+    ThrottlerModule.forRoot([
+      {
+        // TTL is 15 minutes
+        ttl: 900000,
+        // Limit requests up to 100 per minute per IP
+        limit: 100
+      }
+    ]),
     AddressModule,
     AppointmentModule,
     AuthModule,
@@ -52,6 +62,12 @@ import { JoiValidationSchema } from './config/joi.validation'
     SeedModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ]
 })
 export class AppModule {}

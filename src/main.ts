@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ValidationPipe } from '@nestjs/common'
 import { SwaggerModule } from '@nestjs/swagger'
-import { rateLimiter } from './common/middlewares/rate-limiter.middleware'
 import { config } from './common/swagger/config'
 
 async function bootstrap() {
@@ -16,8 +15,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true
     })
   )
-
-  app.use(rateLimiter)
 
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
