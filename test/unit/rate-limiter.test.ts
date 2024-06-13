@@ -27,18 +27,13 @@ describe('Rate Limiting', () => {
 
   it('should block requests over the limit', async () => {
     for (let i = 1; i < 110; i++) {
-      const response = await request(app.getHttpServer()).get('/ping')
+      const response = await fetch('http://localhost:3000/api/ping')
+      const responseJSON = await response.json()
 
-      console.log({
-        i,
-        status: response.status,
-        message: response.body.message
-      })
-
-      if (i > 105) {
+      if (i > 100) {
         expect(response.status).toBe(HttpStatus.TOO_MANY_REQUESTS)
-        expect(response.body.message).toBe(
-          'Too many requests from this IP, please try again later.'
+        expect(responseJSON.message).toBe(
+          'ThrottlerException: Too Many Requests'
         )
       } else {
         expect(response.status).toBe(HttpStatus.OK)
