@@ -8,19 +8,22 @@ import {
   CityService,
   PhoneCodeService
 } from 'src/address/service'
-import { elSalvador } from 'src/init-status/el-salvador'
+import { elSalvador } from 'src/init-status/data/el-salvador.data'
 import { City } from 'src/address/entities/city.entity'
 import { exceptionHandler } from 'src/common/utils'
+import { specialties } from './data/specialty.data'
+import { SpecialtyService } from 'src/specialty/specialty.service'
 
 @Injectable()
 export class InitService {
   constructor(
     @InjectRepository(InitStatus)
     private readonly initStatusRepository: Repository<InitStatus>,
-    private readonly countryService: CountryService,
-    private readonly stateService: StateService,
     private readonly cityService: CityService,
-    private readonly phoneCodeService: PhoneCodeService
+    private readonly countryService: CountryService,
+    private readonly phoneCodeService: PhoneCodeService,
+    private readonly stateService: StateService,
+    private readonly specialtyService: SpecialtyService
   ) {}
 
   private readonly logger = new Logger(InitService.name)
@@ -34,6 +37,7 @@ export class InitService {
 
     // Initialize your data
     await this.createAddressData()
+    await this.createSpecialtyData()
 
     // Mark as initialized
     if (!status) {
@@ -83,11 +87,18 @@ export class InitService {
       }
 
       await Promise.all(citiesItems)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
 
-      return {
-        countries: await this.countryService.findAll(),
-        phoneCodes: await this.phoneCodeService.getAll()
-      }
+  async createSpecialtyData() {
+    try {
+      const specialtyPromises = specialties.map((specialty) =>
+        this.specialtyService.create(specialty)
+      )
+
+      await Promise.all(specialtyPromises)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

@@ -1,4 +1,4 @@
-import { Country } from './types/country.type'
+import { Country } from '../types/country.type'
 
 export const elSalvador: Country = {
   country: 'El Salvador',
