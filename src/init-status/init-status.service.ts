@@ -121,20 +121,21 @@ export class InitService {
   }
 
   async createClinicData() {
+    const query = { limit: 1, offset: 0 }
     try {
       const [country, state, city, specialty] = await Promise.all([
-        this.countryService.findAll(),
-        this.stateService.findAll(),
-        this.cityService.findAll(),
-        this.specialtyService.findAll()
+        this.countryService.findAll(query),
+        this.stateService.findAll(query),
+        this.cityService.findAll(query),
+        this.specialtyService.findAll(query)
       ])
 
       const clinicPromises = clinics.map(
         ({ address, specialtyId, ...clinic }) => {
-          address.cityId = city[0].id
-          address.stateId = state[0].id
-          address.countryId = country[0].id
-          specialtyId = specialty[0].id
+          address.cityId = city.data[0].id
+          address.stateId = state.data[0].id
+          address.countryId = country.data[0].id
+          specialtyId = specialty.data[0].id
 
           return this.clinicService.create({
             ...clinic,
@@ -151,20 +152,21 @@ export class InitService {
   }
 
   async createHospitalData() {
+    const query = { limit: 1, offset: 0 }
     try {
       const [country, state, city, specialty] = await Promise.all([
-        this.countryService.findAll(),
-        this.stateService.findAll(),
-        this.cityService.findAll(),
-        this.specialtyService.findAll()
+        this.countryService.findAll(query),
+        this.stateService.findAll(query),
+        this.cityService.findAll(query),
+        this.specialtyService.findAll(query)
       ])
 
       const hospitalPromises = hospitals.map(
         ({ address, specialtyId, ...hospital }) => {
-          address.cityId = city[0].id
-          address.stateId = state[0].id
-          address.countryId = country[0].id
-          specialtyId = specialty[0].id
+          address.cityId = city.data[0].id
+          address.stateId = state.data[0].id
+          address.countryId = country.data[0].id
+          specialtyId = specialty.data[0].id
 
           return this.hospitalService.create({
             ...hospital,
@@ -193,10 +195,12 @@ export class InitService {
   }
 
   async createAdministratorData() {
+    const query = { limit: 1, offset: 0 }
     try {
-      administrator.regionNumberId = (
-        await this.phoneCodeService.findAll()
-      )[0].id
+      const regionNumberId = (await this.phoneCodeService.findAll(query))
+        .data[0].id
+      administrator.regionNumberId = regionNumberId
+
       await this.authService.registerAdministrator(administrator)
     } catch (error) {
       exceptionHandler(this.logger, error)
