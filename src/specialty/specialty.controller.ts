@@ -25,7 +25,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { SpecialtyResponse } from 'src/common/swagger/classes/specialty.class'
+import {
+  SpecialtyResponse,
+  SpecialtyResponseAll
+} from 'src/common/swagger/classes/specialty.class'
 
 @ApiTags('Specialty')
 @Controller('specialty')
@@ -50,7 +53,7 @@ export class SpecialtyController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [SpecialtyResponse]
+    type: SpecialtyResponseAll
   })
   @ApiOperation({
     summary: 'Find all specialties'

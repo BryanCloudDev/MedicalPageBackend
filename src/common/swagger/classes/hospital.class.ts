@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { FilteredAllResponse } from './address.class'
 
 export class HospitalResponse {
   @ApiProperty({
@@ -12,4 +13,13 @@ export class HospitalResponse {
     description: 'The name of the hospital.'
   })
   name: string
+}
+
+export class HospitalResponseAll extends FilteredAllResponse {
+  @ApiProperty({
+    isArray: true,
+    type: HospitalResponse,
+    description: 'The data array of the response'
+  })
+  data: HospitalResponse[]
 }
