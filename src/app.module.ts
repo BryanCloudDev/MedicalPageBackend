@@ -21,6 +21,7 @@ import { JoiValidationSchema } from './config/joi.validation'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
 import { InitModule } from './init-status/init-status.module'
+import { AdministratorModule } from './administrator/administrator.module'
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { InitModule } from './init-status/init-status.module'
     ReviewModule,
     SpecialtyModule,
     SponsorLevelModule,
-    UserModule
+    UserModule,
+    AdministratorModule
   ],
   controllers: [AppController],
   providers: [

@@ -13,17 +13,20 @@ import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto'
 import { DoctorService } from 'src/doctor/doctor.service'
 import { SpecialtyService } from 'src/specialty/specialty.service'
 import { UserService } from 'src/user/user.service'
+import { CreateAdministratorDto } from 'src/administrator/dto/create-administrator.dto'
+import { AdministratorService } from 'src/administrator/administrator.service'
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly addressService: AddressService,
+    private readonly administratorService: AdministratorService,
+    private readonly doctorService: DoctorService,
+    private readonly jwtService: JwtService,
+    private readonly patientService: PatientService,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly specialtyService: SpecialtyService,
-    private readonly addressService: AddressService,
-    private readonly patientService: PatientService,
-    private readonly doctorService: DoctorService,
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly userService: UserService
   ) {}
 
   private readonly logger = new Logger(AuthService.name)
@@ -80,6 +83,29 @@ export class AuthService {
       )
 
       await this.doctorService.create(user, specialty, createDoctorDto)
+
+      return {
+        token: this.getJwtToken({ id: user.id })
+      }
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async registerAdministrator(createAdministratorDto: CreateAdministratorDto) {
+    const { regionNumberId, ...administratorPartial } = createAdministratorDto
+
+    try {
+      const regionNumber = await this.phoneCodeService.findById(regionNumberId)
+
+      const user = await this.userService.create(
+        administratorPartial,
+        regionNumber,
+        null,
+        Roles.ADMINISTRATOR
+      )
+
+      await this.administratorService.create(user)
 
       return {
         token: this.getJwtToken({ id: user.id })
