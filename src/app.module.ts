@@ -17,10 +17,10 @@ import { SponsorLevelModule } from './sponsor-level/sponsor-level.module'
 import { FileModule } from './file/file.module'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
-import { SeedModule } from './seed/seed.module'
 import { JoiValidationSchema } from './config/joi.validation'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
+import { InitModule } from './init-status/init-status.module'
 
 @Module({
   imports: [
@@ -54,12 +54,12 @@ import { APP_GUARD } from '@nestjs/core'
     DoctorModule,
     FileModule,
     HospitalModule,
+    InitModule,
     PatientModule,
     ReviewModule,
     SpecialtyModule,
     SponsorLevelModule,
-    UserModule,
-    SeedModule
+    UserModule
   ],
   controllers: [AppController],
   providers: [
