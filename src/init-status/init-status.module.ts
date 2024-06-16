@@ -5,6 +5,7 @@ import { InitStatus } from './entities/init.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { SpecialtyModule } from 'src/specialty/specialty.module'
 import { ClinicModule } from 'src/clinic/clinic.module'
+import { HospitalModule } from 'src/hospital/hospital.module'
 
 @Module({
   providers: [InitService],
@@ -12,7 +13,8 @@ import { ClinicModule } from 'src/clinic/clinic.module'
     AddressModule,
     TypeOrmModule.forFeature([InitStatus]),
     SpecialtyModule,
-    ClinicModule
+    ClinicModule,
+    HospitalModule
   ]
 })
 export class InitModule {}

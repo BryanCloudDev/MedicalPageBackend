@@ -15,6 +15,8 @@ import { specialties } from './data/specialty.data'
 import { SpecialtyService } from 'src/specialty/specialty.service'
 import { clinics } from './data/clinic.data'
 import { ClinicService } from 'src/clinic/clinic.service'
+import { hospitals } from './data/hospital.data'
+import { HospitalService } from 'src/hospital/hospital.service'
 
 @Injectable()
 export class InitService {
@@ -26,7 +28,8 @@ export class InitService {
     private readonly phoneCodeService: PhoneCodeService,
     private readonly stateService: StateService,
     private readonly specialtyService: SpecialtyService,
-    private readonly clinicService: ClinicService
+    private readonly clinicService: ClinicService,
+    private readonly hospitalService: HospitalService
   ) {}
 
   private readonly logger = new Logger(InitService.name)
@@ -42,6 +45,7 @@ export class InitService {
     await this.createAddressData()
     await this.createSpecialtyData()
     await this.createClinicData()
+    await this.createHospitalData()
 
     // Mark as initialized
     if (!status) {
@@ -133,6 +137,36 @@ export class InitService {
       )
 
       await Promise.all(clinicPromises)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async createHospitalData() {
+    try {
+      const [country, state, city, specialty] = await Promise.all([
+        this.countryService.findAll(),
+        this.stateService.findAll(),
+        this.cityService.findAll(),
+        this.specialtyService.findAll()
+      ])
+
+      const hospitalPromises = hospitals.map(
+        ({ address, specialtyId, ...hospital }) => {
+          address.cityId = city[0].id
+          address.stateId = state[0].id
+          address.countryId = country[0].id
+          specialtyId = specialty[0].id
+
+          return this.hospitalService.create({
+            ...hospital,
+            address,
+            specialtyId
+          })
+        }
+      )
+
+      await Promise.all(hospitalPromises)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
