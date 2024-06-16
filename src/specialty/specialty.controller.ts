@@ -16,6 +16,7 @@ import { Roles } from 'src/user/enums'
 import { PaginationDto } from 'src/common/dtos'
 import {
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -24,7 +25,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { SpecialtyResponse } from 'src/common/swagger/classes/specialty.class'
+import {
+  SpecialtyResponse,
+  SpecialtyResponseAll
+} from 'src/common/swagger/classes/specialty.class'
 
 @ApiTags('Specialty')
 @Controller('specialty')
@@ -49,11 +53,12 @@ export class SpecialtyController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [SpecialtyResponse]
+    type: SpecialtyResponseAll
   })
   @ApiOperation({
     summary: 'Find all specialties'
   })
+  @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
     return this.specialtyService.findAll(query)
   }

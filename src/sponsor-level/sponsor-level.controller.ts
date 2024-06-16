@@ -6,14 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   HttpCode,
   HttpStatus
 } from '@nestjs/common'
 import { SponsorLevelService } from './sponsor-level.service'
 import { CreateSponsorLevelDto } from './dto/create-sponsor-level.dto'
 import { UpdateSponsorLevelDto } from './dto/update-sponsor-level.dto'
-import { PaginationDto } from 'src/common/dtos'
 import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
@@ -55,7 +53,7 @@ export class SponsorLevelController {
   @ApiOperation({
     summary: 'Find all sponsor levels'
   })
-  findAll(@Query() query: PaginationDto) {
+  findAll() {
     return this.sponsorLevelService.findAll()
   }
 

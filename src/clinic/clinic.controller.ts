@@ -17,6 +17,7 @@ import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -25,7 +26,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { ClinicResponse } from 'src/common/swagger/classes/clinic.class'
+import {
+  ClinicResponse,
+  ClinicResponseAll
+} from 'src/common/swagger/classes/clinic.class'
 import { PaginationDto } from 'src/common/dtos'
 
 @ApiTags('Clinic')
@@ -51,13 +55,14 @@ export class ClinicController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [ClinicResponse]
+    type: ClinicResponseAll
   })
   @ApiOperation({
     summary: 'Find all clinics'
   })
+  @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.clinicService.findAll()
+    return this.clinicService.findAll(query)
   }
 
   @Get(':id')

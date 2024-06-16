@@ -10,10 +10,17 @@ import { Repository } from 'typeorm'
 import { CreateAddressDto } from '../dto/address/create-address.dto'
 import { UpdateAddressDto } from '../dto/address/update-address.dto'
 import { Address } from '../entities/address.entity'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
 import { CountryService } from './country.service'
 import { StateService } from './state.service'
 import { CityService } from './city.service'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class AddressService {
@@ -27,8 +34,8 @@ export class AddressService {
   ) {}
 
   private readonly logger = new Logger(AddressService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create(createAddressDto: CreateAddressDto): Promise<Address> {
     try {
@@ -75,17 +82,42 @@ export class AddressService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
+  async findAll(
+    paginationDto: PaginationDto
+  ): Promise<PaginatedResponse<Address> | GenericResponse<Address[]>> {
+    const { limit, offset } = paginationDto
     try {
-      const address = await this.addressRepository.find({ skip, take })
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
 
-      return deleted ? address : this.trasformResponse(address)
+        const response = await pagination<Address>({
+          repository: this.addressRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
+      const addresses = await this.addressRepository.find({
+        where: {
+          deletedOn: null
+        }
+      })
+
+      return {
+        data: addresses
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
   }
 
-  async updateById(id: string, updateAddressDto: UpdateAddressDto) {
+  async updateById(
+    id: string,
+    updateAddressDto: UpdateAddressDto
+  ): Promise<void> {
     try {
       const { countryId, stateId, cityId, ...partialAddress } = updateAddressDto
 
@@ -111,8 +143,6 @@ export class AddressService {
         state,
         city
       })
-
-      return
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -134,15 +164,5 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(`The address with id ${id} was not found`)
     }
-  }
-
-  private trasformResponse(addresses: Address[]) {
-    return addresses
-      .filter((address) => address.deletedOn === null)
-      .map((address) => {
-        delete address.deletedOn
-
-        return address
-      })
   }
 }

@@ -27,7 +27,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { CityResponse } from 'src/common/swagger/classes/address.class'
+import {
+  CityResponse,
+  CityResponseAll
+} from 'src/common/swagger/classes/address.class'
 
 @ApiTags('City')
 @Controller('city')
@@ -52,14 +55,14 @@ export class CityController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [CityResponse]
+    type: CityResponseAll
   })
   @ApiOperation({
     summary: 'Find all cities'
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.cityService.findAll()
+    return this.cityService.findAll(query)
   }
 
   @Get(':id')

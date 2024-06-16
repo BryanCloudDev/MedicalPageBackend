@@ -13,6 +13,7 @@ import { Doctor } from 'src/doctor/entities/doctor.entity'
 import { PhoneCode } from 'src/address/entities/phone-code.entity'
 import { BaseEntity } from 'src/common/entities'
 import { Address } from 'src/address/entities/address.entity'
+import { Administrator } from 'src/administrator/entities/administrator.entity'
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -73,8 +74,14 @@ export class User extends BaseEntity {
   })
   doctor: Doctor
 
-  @OneToOne(() => Address, (address) => address.user, {
+  @OneToOne(() => Administrator, (administrator) => administrator.user, {
     nullable: false,
+    eager: true
+  })
+  administrator: Administrator
+
+  @OneToOne(() => Address, (address) => address.user, {
+    // nullable: false,
     eager: true
   })
   @JoinColumn()

@@ -26,7 +26,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { HospitalResponse } from 'src/common/swagger/classes/hospital.class'
+import {
+  HospitalResponse,
+  HospitalResponseAll
+} from 'src/common/swagger/classes/hospital.class'
 import { PaginationDto } from 'src/common/dtos'
 
 @ApiTags('Hospital')
@@ -52,14 +55,14 @@ export class HospitalController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [HospitalResponse]
+    type: HospitalResponseAll
   })
   @ApiOperation({
     summary: 'Find all hospitals'
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.hospitalService.findAll(query.limit, query.offset)
+    return this.hospitalService.findAll(query)
   }
 
   @Get(':id')

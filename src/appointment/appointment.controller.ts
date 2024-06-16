@@ -7,8 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
-  HttpStatus,
-  Query
+  HttpStatus
 } from '@nestjs/common'
 import { AppointmentService } from './appointment.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
@@ -26,7 +25,6 @@ import {
 } from '@nestjs/swagger'
 import { Description } from 'src/common/swagger/description.swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
-import { PaginationDto } from 'src/common/dtos'
 import { AppointmentResponse } from 'src/common/swagger/classes/appointment.class'
 @ApiTags('Appointment')
 @Controller('appointment')
@@ -61,7 +59,7 @@ export class AppointmentController {
     description: Description.administrator
   })
   @Auth(Roles.ADMINISTRATOR)
-  findAll(@Query() query: PaginationDto) {
+  findAll() {
     return this.appointmentService.findAll()
   }
 

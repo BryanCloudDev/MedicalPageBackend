@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config'
 @Module({
   imports: [TypeOrmModule.forFeature([SponsorLevel]), ConfigModule],
   controllers: [SponsorLevelController],
-  providers: [SponsorLevelService]
+  providers: [SponsorLevelService],
+  exports: [SponsorLevelService]
 })
 export class SponsorLevelModule {}

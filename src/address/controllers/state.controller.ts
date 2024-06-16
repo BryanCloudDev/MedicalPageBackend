@@ -27,7 +27,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { StateResponse } from 'src/common/swagger/classes/address.class'
+import {
+  StateResponse,
+  StateResponseAll
+} from 'src/common/swagger/classes/address.class'
 
 @ApiTags('State')
 @Controller('state')
@@ -52,14 +55,14 @@ export class StateController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [StateResponse]
+    type: StateResponseAll
   })
   @ApiOperation({
     summary: 'Find all states'
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.stateService.findAll()
+    return this.stateService.findAll(query)
   }
 
   @Get(':id')

@@ -17,17 +17,19 @@ import { UserModule } from 'src/user/user.module'
 import { PatientModule } from 'src/patient/patient.module'
 import { DoctorModule } from 'src/doctor/doctor.module'
 import { SpecialtyModule } from 'src/specialty/specialty.module'
+import { AdministratorModule } from 'src/administrator/administrator.module'
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   imports: [
-    ConfigModule,
-    FileModule,
     AddressModule,
-    UserModule,
-    PatientModule,
+    AdministratorModule,
+    ConfigModule,
     DoctorModule,
+    FileModule,
+    PatientModule,
     SpecialtyModule,
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -40,7 +42,7 @@ import { SpecialtyModule } from 'src/specialty/specialty.module'
       })
     })
   ],
-  exports: [JwtStrategy, PassportModule, JwtModule]
+  exports: [JwtStrategy, PassportModule, JwtModule, AuthService]
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -7,11 +7,18 @@ import {
 } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { State } from '../entities/state.entity'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
 import { ConfigService } from '@nestjs/config'
 import { CreateStateDto } from '../dto/state/create-state.dto'
 import { CountryService } from './country.service'
 import { UpdateStateDto } from '../dto/state/update-state.dto'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class StateService {
@@ -23,8 +30,8 @@ export class StateService {
   ) {}
 
   private readonly logger = new Logger(StateService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create(createStateDto: CreateStateDto): Promise<State> {
     try {
@@ -56,11 +63,34 @@ export class StateService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
-    try {
-      const states = await this.stateRepository.find({ skip, take })
+  async findAll(
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<State> | GenericResponse<State[]>> {
+    const { limit, offset } = paginationDto
 
-      return deleted ? states : this.trasformResponse(states)
+    try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<State>({
+          repository: this.stateRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
+      const states = await this.stateRepository.find({
+        where: {
+          deletedOn: null
+        }
+      })
+
+      return {
+        data: states
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

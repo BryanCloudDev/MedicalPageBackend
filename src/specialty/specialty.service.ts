@@ -11,7 +11,14 @@ import { Repository } from 'typeorm'
 import { CreateSpecialtyDto } from './dto/create-specialty.dto'
 import { UpdateSpecialtyDto } from './dto/update-specialty.dto'
 import { Specialty } from './entities/specialty.entity'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class SpecialtyService {
@@ -22,8 +29,8 @@ export class SpecialtyService {
   ) {}
 
   private readonly logger = new Logger(SpecialtyService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create(createSpecialtyDto: CreateSpecialtyDto): Promise<void> {
     try {
@@ -37,17 +44,33 @@ export class SpecialtyService {
   }
 
   async findAll(
-    skip = this.skip,
-    take = this.take,
-    deleted = false
-  ): Promise<Specialty[]> {
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<Specialty> | GenericResponse<Specialty[]>> {
+    const { limit, offset } = paginationDto
+
     try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<Specialty>({
+          repository: this.specialtyRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
       const specialties = await this.specialtyRepository.find({
-        skip,
-        take
+        where: {
+          deletedOn: null
+        }
       })
 
-      return deleted ? specialties : this.trasformResponse(specialties)
+      return {
+        data: specialties
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

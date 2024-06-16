@@ -27,7 +27,10 @@ import {
 } from '@nestjs/swagger'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 import { Description } from 'src/common/swagger/description.swagger'
-import { PhoneCodeResponse } from 'src/common/swagger/classes/address.class'
+import {
+  PhoneCodeResponse,
+  PhoneCodeResponseAll
+} from 'src/common/swagger/classes/address.class'
 
 @ApiTags('Phone Code')
 @Controller('phone-code')
@@ -52,14 +55,14 @@ export class PhoneCodeController {
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
-    type: [PhoneCodeResponse]
+    type: PhoneCodeResponseAll
   })
   @ApiOperation({
     summary: 'Find all phone codes'
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.phoneCodeService.findAll()
+    return this.phoneCodeService.findAll(query)
   }
 
   @Get(':id')

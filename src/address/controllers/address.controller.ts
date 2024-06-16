@@ -15,6 +15,7 @@ import { UpdateAddressDto } from '../dto/address/update-address.dto'
 import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -22,7 +23,10 @@ import {
   ApiTags
 } from '@nestjs/swagger'
 import { Description } from 'src/common/swagger/description.swagger'
-import { AddressResponse } from 'src/common/swagger/classes/address.class'
+import {
+  AddressResponse,
+  AddressResponseAll
+} from 'src/common/swagger/classes/address.class'
 import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
 
 @ApiTags('Address')
@@ -33,15 +37,16 @@ export class AddressController {
   @Get()
   @GenericResponses({ auth: true })
   @ApiOkResponse({
-    type: [AddressResponse]
+    type: AddressResponseAll
   })
   @ApiOperation({
     summary: 'Find all addresses',
     description: Description.administrator
   })
+  @ApiExtraModels(PaginationDto)
   @Auth(Roles.ADMINISTRATOR)
   findAll(@Query() query: PaginationDto) {
-    return this.addressService.findAll()
+    return this.addressService.findAll(query)
   }
 
   @Get(':id')

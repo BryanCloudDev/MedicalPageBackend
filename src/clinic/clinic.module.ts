@@ -16,6 +16,7 @@ import { SpecialtyModule } from 'src/specialty/specialty.module'
     SpecialtyModule
   ],
   controllers: [ClinicController],
-  providers: [ClinicService]
+  providers: [ClinicService],
+  exports: [ClinicService]
 })
 export class ClinicModule {}
