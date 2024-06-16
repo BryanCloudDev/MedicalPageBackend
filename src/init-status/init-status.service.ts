@@ -17,6 +17,8 @@ import { clinics } from './data/clinic.data'
 import { ClinicService } from 'src/clinic/clinic.service'
 import { hospitals } from './data/hospital.data'
 import { HospitalService } from 'src/hospital/hospital.service'
+import { SponsorLevelService } from 'src/sponsor-level/sponsor-level.service'
+import { sponsorLevels } from './data/sponsor-level.data'
 
 @Injectable()
 export class InitService {
@@ -29,7 +31,8 @@ export class InitService {
     private readonly stateService: StateService,
     private readonly specialtyService: SpecialtyService,
     private readonly clinicService: ClinicService,
-    private readonly hospitalService: HospitalService
+    private readonly hospitalService: HospitalService,
+    private readonly sponsorLevelService: SponsorLevelService
   ) {}
 
   private readonly logger = new Logger(InitService.name)
@@ -46,6 +49,7 @@ export class InitService {
     await this.createSpecialtyData()
     await this.createClinicData()
     await this.createHospitalData()
+    await this.createSponsorLevelData()
 
     // Mark as initialized
     if (!status) {
@@ -167,6 +171,18 @@ export class InitService {
       )
 
       await Promise.all(hospitalPromises)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async createSponsorLevelData() {
+    try {
+      const sponsorLevelPromises = sponsorLevels.map((sponsorLevel) =>
+        this.sponsorLevelService.create(sponsorLevel)
+      )
+
+      await Promise.all(sponsorLevelPromises)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

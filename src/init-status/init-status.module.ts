@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { SpecialtyModule } from 'src/specialty/specialty.module'
 import { ClinicModule } from 'src/clinic/clinic.module'
 import { HospitalModule } from 'src/hospital/hospital.module'
+import { SponsorLevelModule } from 'src/sponsor-level/sponsor-level.module'
 
 @Module({
   providers: [InitService],
@@ -14,7 +15,8 @@ import { HospitalModule } from 'src/hospital/hospital.module'
     TypeOrmModule.forFeature([InitStatus]),
     SpecialtyModule,
     ClinicModule,
-    HospitalModule
+    HospitalModule,
+    SponsorLevelModule
   ]
 })
 export class InitModule {}
