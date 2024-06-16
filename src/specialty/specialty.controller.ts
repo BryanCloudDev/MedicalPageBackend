@@ -16,6 +16,7 @@ import { Roles } from 'src/user/enums'
 import { PaginationDto } from 'src/common/dtos'
 import {
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -54,6 +55,7 @@ export class SpecialtyController {
   @ApiOperation({
     summary: 'Find all specialties'
   })
+  @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
     return this.specialtyService.findAll(query)
   }

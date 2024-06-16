@@ -59,7 +59,7 @@ export class StateController {
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.stateService.findAll()
+    return this.stateService.findAll(query)
   }
 
   @Get(':id')

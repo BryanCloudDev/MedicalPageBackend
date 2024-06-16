@@ -59,7 +59,7 @@ export class CountryController {
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.countryService.findAll()
+    return this.countryService.findAll(query)
   }
 
   @Get(':id')

@@ -10,10 +10,17 @@ import { Clinic } from './entities/clinic.entity'
 import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AddressService } from 'src/address/service'
-import { exceptionHandler, currentDate } from 'src/common/utils'
+import {
+  exceptionHandler,
+  currentDate,
+  pagination,
+  PaginatedResponse
+} from 'src/common/utils'
 import { Repository } from 'typeorm'
 import { SpecialtyService } from 'src/specialty/specialty.service'
 import { Specialty } from 'src/specialty/entities/specialty.entity'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class ClinicService {
@@ -26,8 +33,8 @@ export class ClinicService {
   ) {}
 
   private readonly logger = new Logger(ClinicService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create({
     address: addressDto,
@@ -50,14 +57,34 @@ export class ClinicService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
+  async findAll(
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<Clinic> | GenericResponse<Clinic[]>> {
+    const { limit, offset } = paginationDto
+
     try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<Clinic>({
+          repository: this.clinicRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
       const clinics = await this.clinicRepository.find({
-        skip,
-        take
+        where: {
+          deletedOn: null
+        }
       })
 
-      return deleted ? clinics : this.trasformResponse(clinics)
+      return {
+        data: clinics
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

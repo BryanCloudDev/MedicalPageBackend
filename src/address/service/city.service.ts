@@ -7,11 +7,18 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Repository } from 'typeorm'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
 import { City } from '../entities/city.entity'
 import { CreateCityDto } from '../dto/city/create-city.dto'
 import { StateService } from './state.service'
 import { UpdateCityDto } from '../dto/city/update-city.dto'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
+import { PaginationDto } from 'src/common/dtos'
 
 @Injectable()
 export class CityService {
@@ -23,8 +30,8 @@ export class CityService {
   ) {}
 
   private readonly logger = new Logger(CityService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create(createCityDto: CreateCityDto): Promise<City> {
     try {
@@ -56,11 +63,34 @@ export class CityService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
-    try {
-      const cities = await this.cityRepository.find({ skip, take })
+  async findAll(
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<City> | GenericResponse<City[]>> {
+    const { limit, offset } = paginationDto
 
-      return deleted ? cities : this.trasformResponse(cities)
+    try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<City>({
+          repository: this.cityRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
+      const cities = await this.cityRepository.find({
+        where: {
+          deletedOn: null
+        }
+      })
+
+      return {
+        data: cities
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

@@ -15,6 +15,7 @@ import { UpdateAddressDto } from '../dto/address/update-address.dto'
 import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -39,9 +40,10 @@ export class AddressController {
     summary: 'Find all addresses',
     description: Description.administrator
   })
+  @ApiExtraModels(PaginationDto)
   @Auth(Roles.ADMINISTRATOR)
   findAll(@Query() query: PaginationDto) {
-    return this.addressService.findAll()
+    return this.addressService.findAll(query)
   }
 
   @Get(':id')

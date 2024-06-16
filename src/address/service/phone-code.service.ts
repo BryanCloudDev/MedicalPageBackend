@@ -9,9 +9,16 @@ import { ConfigService } from '@nestjs/config'
 import { Repository } from 'typeorm'
 import { CreatePhoneCodeDto } from '../dto/phone-code/create-phone-code.dto'
 import { UpdatePhoneCodeDto } from '../dto/phone-code/update-phone-code.dto'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
 import { PhoneCode } from '../entities/phone-code.entity'
 import { DbErrorCodes } from 'src/common/enums'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class PhoneCodeService {
@@ -22,8 +29,8 @@ export class PhoneCodeService {
   ) {}
 
   private readonly logger = new Logger(PhoneCodeService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create({ code }: CreatePhoneCodeDto): Promise<PhoneCode> {
     try {
@@ -58,17 +65,33 @@ export class PhoneCodeService {
   }
 
   async findAll(
-    skip = this.skip,
-    take = this.take,
-    deleted = false
-  ): Promise<PhoneCode[]> {
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<PhoneCode> | GenericResponse<PhoneCode[]>> {
+    const { limit, offset } = paginationDto
+
     try {
-      const specialties = await this.phoneCodeRepository.find({
-        skip,
-        take
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<PhoneCode>({
+          repository: this.phoneCodeRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
+      const phoneCodes = await this.phoneCodeRepository.find({
+        where: {
+          deletedOn: null
+        }
       })
 
-      return deleted ? specialties : this.trasformResponse(specialties)
+      return {
+        data: phoneCodes
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

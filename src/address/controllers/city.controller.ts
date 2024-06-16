@@ -59,7 +59,7 @@ export class CityController {
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.cityService.findAll()
+    return this.cityService.findAll(query)
   }
 
   @Get(':id')

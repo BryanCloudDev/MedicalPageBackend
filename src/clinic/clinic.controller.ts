@@ -17,6 +17,7 @@ import { Auth } from 'src/auth/decorators'
 import { Roles } from 'src/user/enums'
 import {
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -56,8 +57,9 @@ export class ClinicController {
   @ApiOperation({
     summary: 'Find all clinics'
   })
+  @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.clinicService.findAll()
+    return this.clinicService.findAll(query)
   }
 
   @Get(':id')

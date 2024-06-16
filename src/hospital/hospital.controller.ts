@@ -59,7 +59,7 @@ export class HospitalController {
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.hospitalService.findAll(query.limit, query.offset)
+    return this.hospitalService.findAll(query)
   }
 
   @Get(':id')

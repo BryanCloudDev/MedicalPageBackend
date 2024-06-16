@@ -59,7 +59,7 @@ export class PhoneCodeController {
   })
   @ApiExtraModels(PaginationDto)
   findAll(@Query() query: PaginationDto) {
-    return this.phoneCodeService.findAll()
+    return this.phoneCodeService.findAll(query)
   }
 
   @Get(':id')

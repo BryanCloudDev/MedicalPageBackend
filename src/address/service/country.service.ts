@@ -7,10 +7,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Country } from '../entities/country.entity'
-import { currentDate, exceptionHandler } from 'src/common/utils'
+import {
+  PaginatedResponse,
+  currentDate,
+  exceptionHandler,
+  pagination
+} from 'src/common/utils'
 import { CreateCountryDto } from '../dto/country/create-country.dto'
 import { ConfigService } from '@nestjs/config'
 import { UpdateCountryDto } from '../dto/country/update-country.dto'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class CountryService {
@@ -21,8 +28,8 @@ export class CountryService {
   ) {}
 
   private readonly logger = new Logger(CountryService.name)
-  private readonly take = this.configService.get('ENTITIES_LIMIT')
-  private readonly skip = this.configService.get('ENTITIES_SKIP')
+  private readonly take = this.configService.get<number>('ENTITIES_LIMIT')
+  private readonly skip = this.configService.get<number>('ENTITIES_SKIP')
 
   async create(createCountryDto: CreateCountryDto): Promise<Country> {
     try {
@@ -53,11 +60,34 @@ export class CountryService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
-    try {
-      const countries = await this.countryRepository.find({ skip, take })
+  async findAll(
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<Country> | GenericResponse<Country[]>> {
+    const { limit, offset } = paginationDto
 
-      return deleted ? countries : this.trasformResponse(countries)
+    try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<Country>({
+          repository: this.countryRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
+      const countries = await this.countryRepository.find({
+        where: {
+          deletedOn: null
+        }
+      })
+
+      return {
+        data: countries
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

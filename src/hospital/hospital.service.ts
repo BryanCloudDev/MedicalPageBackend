@@ -10,9 +10,16 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Hospital } from './entities/hospital.entity'
 import { Repository } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
-import { exceptionHandler, currentDate } from 'src/common/utils'
+import {
+  exceptionHandler,
+  currentDate,
+  PaginatedResponse,
+  pagination
+} from 'src/common/utils'
 import { AddressService } from 'src/address/service'
 import { SpecialtyService } from 'src/specialty/specialty.service'
+import { PaginationDto } from 'src/common/dtos'
+import { GenericResponse } from 'src/common/interfaces/genericResponse.interface'
 
 @Injectable()
 export class HospitalService {
@@ -49,14 +56,34 @@ export class HospitalService {
     }
   }
 
-  async findAll(take = this.take, skip = this.skip, deleted = false) {
+  async findAll(
+    paginationDto?: PaginationDto
+  ): Promise<PaginatedResponse<Hospital> | GenericResponse<Hospital[]>> {
+    const { limit, offset } = paginationDto
+
     try {
+      if (limit || offset) {
+        const take = limit || this.take
+        const skip = offset || this.skip
+
+        const response = await pagination<Hospital>({
+          repository: this.hospitalRepository,
+          skip,
+          take
+        })
+
+        return response
+      }
+
       const hospitals = await this.hospitalRepository.find({
-        skip,
-        take
+        where: {
+          deletedOn: null
+        }
       })
 
-      return deleted ? hospitals : this.trasformResponse(hospitals)
+      return {
+        data: hospitals
+      }
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
