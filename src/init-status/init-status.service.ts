@@ -19,20 +19,23 @@ import { hospitals } from './data/hospital.data'
 import { HospitalService } from 'src/hospital/hospital.service'
 import { SponsorLevelService } from 'src/sponsor-level/sponsor-level.service'
 import { sponsorLevels } from './data/sponsor-level.data'
+import { administrator } from './data/administrator.data'
+import { AuthService } from 'src/auth/auth.service'
 
 @Injectable()
 export class InitService {
   constructor(
     @InjectRepository(InitStatus)
     private readonly initStatusRepository: Repository<InitStatus>,
+    private readonly authService: AuthService,
     private readonly cityService: CityService,
-    private readonly countryService: CountryService,
-    private readonly phoneCodeService: PhoneCodeService,
-    private readonly stateService: StateService,
-    private readonly specialtyService: SpecialtyService,
     private readonly clinicService: ClinicService,
+    private readonly countryService: CountryService,
     private readonly hospitalService: HospitalService,
-    private readonly sponsorLevelService: SponsorLevelService
+    private readonly phoneCodeService: PhoneCodeService,
+    private readonly specialtyService: SpecialtyService,
+    private readonly sponsorLevelService: SponsorLevelService,
+    private readonly stateService: StateService
   ) {}
 
   private readonly logger = new Logger(InitService.name)
@@ -50,6 +53,7 @@ export class InitService {
     await this.createClinicData()
     await this.createHospitalData()
     await this.createSponsorLevelData()
+    await this.createAdministratorData()
 
     // Mark as initialized
     if (!status) {
@@ -183,6 +187,17 @@ export class InitService {
       )
 
       await Promise.all(sponsorLevelPromises)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async createAdministratorData() {
+    try {
+      administrator.regionNumberId = (
+        await this.phoneCodeService.findAll()
+      )[0].id
+      await this.authService.registerAdministrator(administrator)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

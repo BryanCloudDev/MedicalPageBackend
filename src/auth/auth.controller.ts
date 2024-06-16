@@ -1,4 +1,11 @@
-import { Controller, Post, Body, Logger } from '@nestjs/common'
+import {
+  Controller,
+  Post,
+  Body,
+  Logger,
+  HttpCode,
+  HttpStatus
+} from '@nestjs/common'
 import { CreatePatientDto } from 'src/patient/dto/create-patient.dto'
 import { AuthService } from './auth.service'
 import { LoginUserDto } from './dto'
@@ -74,6 +81,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Authenticate a user'
   })
+  @HttpCode(HttpStatus.OK)
   loginPatient(@Body() loginUserDto: LoginUserDto) {
     return this.authService.loginUser(loginUserDto)
   }

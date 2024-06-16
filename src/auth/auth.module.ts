@@ -42,7 +42,7 @@ import { AdministratorModule } from 'src/administrator/administrator.module'
       })
     })
   ],
-  exports: [JwtStrategy, PassportModule, JwtModule]
+  exports: [JwtStrategy, PassportModule, JwtModule, AuthService]
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

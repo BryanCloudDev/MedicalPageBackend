@@ -7,15 +7,17 @@ import { SpecialtyModule } from 'src/specialty/specialty.module'
 import { ClinicModule } from 'src/clinic/clinic.module'
 import { HospitalModule } from 'src/hospital/hospital.module'
 import { SponsorLevelModule } from 'src/sponsor-level/sponsor-level.module'
+import { AuthModule } from 'src/auth/auth.module'
 
 @Module({
   providers: [InitService],
   imports: [
-    AddressModule,
     TypeOrmModule.forFeature([InitStatus]),
-    SpecialtyModule,
+    AddressModule,
+    AuthModule,
     ClinicModule,
     HospitalModule,
+    SpecialtyModule,
     SponsorLevelModule
   ]
 })
