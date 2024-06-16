@@ -13,6 +13,8 @@ import { City } from 'src/address/entities/city.entity'
 import { exceptionHandler } from 'src/common/utils'
 import { specialties } from './data/specialty.data'
 import { SpecialtyService } from 'src/specialty/specialty.service'
+import { clinics } from './data/clinic.data'
+import { ClinicService } from 'src/clinic/clinic.service'
 
 @Injectable()
 export class InitService {
@@ -23,7 +25,8 @@ export class InitService {
     private readonly countryService: CountryService,
     private readonly phoneCodeService: PhoneCodeService,
     private readonly stateService: StateService,
-    private readonly specialtyService: SpecialtyService
+    private readonly specialtyService: SpecialtyService,
+    private readonly clinicService: ClinicService
   ) {}
 
   private readonly logger = new Logger(InitService.name)
@@ -38,6 +41,7 @@ export class InitService {
     // Initialize your data
     await this.createAddressData()
     await this.createSpecialtyData()
+    await this.createClinicData()
 
     // Mark as initialized
     if (!status) {
@@ -99,6 +103,36 @@ export class InitService {
       )
 
       await Promise.all(specialtyPromises)
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
+  }
+
+  async createClinicData() {
+    try {
+      const [country, state, city, specialty] = await Promise.all([
+        this.countryService.findAll(),
+        this.stateService.findAll(),
+        this.cityService.findAll(),
+        this.specialtyService.findAll()
+      ])
+
+      const clinicPromises = clinics.map(
+        ({ address, specialtyId, ...clinic }) => {
+          address.cityId = city[0].id
+          address.stateId = state[0].id
+          address.countryId = country[0].id
+          specialtyId = specialty[0].id
+
+          return this.clinicService.create({
+            ...clinic,
+            address,
+            specialtyId
+          })
+        }
+      )
+
+      await Promise.all(clinicPromises)
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
