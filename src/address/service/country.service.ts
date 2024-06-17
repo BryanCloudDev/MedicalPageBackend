@@ -60,6 +60,23 @@ export class CountryService {
     }
   }
 
+  async findCountryWithRelations(
+    countryId: string,
+    stateId: string,
+    cityId: string
+  ): Promise<Country> {
+    const country = await this.countryRepository.findOne({
+      where: {
+        deletedOn: null,
+        id: countryId,
+        states: { id: stateId, cities: { id: cityId } }
+      },
+      relations: ['states', 'states.cities']
+    })
+
+    return country
+  }
+
   async findAll(
     paginationDto?: PaginationDto
   ): Promise<PaginatedResponse<Country> | GenericResponse<Country[]>> {
@@ -116,16 +133,6 @@ export class CountryService {
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
-  }
-
-  private trasformResponse(countries: Country[]) {
-    return countries
-      .filter((country) => country.deletedOn === null)
-      .map((country) => {
-        delete country.deletedOn
-
-        return country
-      })
   }
 
   private checkIfCountryExists(id: string, country: Country | undefined) {

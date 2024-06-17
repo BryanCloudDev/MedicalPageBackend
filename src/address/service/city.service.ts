@@ -63,12 +63,15 @@ export class CityService {
     }
   }
 
-  async findAll(
-    paginationDto?: PaginationDto
+  async findAllByStateId(
+    stateId: string,
+    paginationDto: PaginationDto
   ): Promise<PaginatedResponse<City> | GenericResponse<City[]>> {
     const { limit, offset } = paginationDto
 
     try {
+      await this.stateService.findById(stateId)
+
       if (limit || offset) {
         const take = limit || this.take
         const skip = offset || this.skip
@@ -76,7 +79,8 @@ export class CityService {
         const response = await pagination<City>({
           repository: this.cityRepository,
           skip,
-          take
+          take,
+          condition: { state: { id: stateId } }
         })
 
         return response
@@ -84,7 +88,8 @@ export class CityService {
 
       const cities = await this.cityRepository.find({
         where: {
-          deletedOn: null
+          deletedOn: null,
+          state: { id: stateId }
         }
       })
 
@@ -116,16 +121,6 @@ export class CityService {
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
-  }
-
-  private trasformResponse(cities: City[]) {
-    return cities
-      .filter((city) => city.deletedOn === null)
-      .map((city) => {
-        delete city.deletedOn
-
-        return city
-      })
   }
 
   private checkIfCityExists(id: string, country: City | undefined) {

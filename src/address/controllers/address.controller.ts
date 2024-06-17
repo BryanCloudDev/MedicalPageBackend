@@ -59,9 +59,9 @@ export class AddressController {
   })
   @ApiOperation({
     summary: 'Find address by id',
-    description: Description.getPatientAndDoctor()
+    description: Description.administrator
   })
-  @Auth(Roles.PATIENT, Roles.DOCTOR)
+  @Auth(Roles.ADMINISTRATOR)
   findById(@Param('id') id: string) {
     return this.addressService.findById(id)
   }
@@ -76,9 +76,9 @@ export class AddressController {
   })
   @ApiOperation({
     summary: 'Update address by id',
-    description: Description.getDoctorPatientAndAdministrator()
+    description: Description.administrator
   })
-  @Auth(Roles.PATIENT, Roles.DOCTOR, Roles.ADMINISTRATOR)
+  @Auth(Roles.ADMINISTRATOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,

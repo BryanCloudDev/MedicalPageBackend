@@ -48,12 +48,15 @@ export class InitService {
     }
 
     // Initialize your data
+    console.log('Initializing data...')
+
     await this.createAddressData()
     await this.createSpecialtyData()
     await this.createClinicData()
     await this.createHospitalData()
     await this.createSponsorLevelData()
     await this.createAdministratorData()
+    console.log('Data initialized!')
 
     // Mark as initialized
     if (!status) {
@@ -123,12 +126,20 @@ export class InitService {
   async createClinicData() {
     const query = { limit: 1, offset: 0 }
     try {
-      const [country, state, city, specialty] = await Promise.all([
+      const [country, specialty] = await Promise.all([
         this.countryService.findAll(query),
-        this.stateService.findAll(query),
-        this.cityService.findAll(query),
         this.specialtyService.findAll(query)
       ])
+
+      const state = await this.stateService.findAllByCountryId(
+        country.data[0].id,
+        query
+      )
+
+      const city = await this.cityService.findAllByStateId(
+        state.data[0].id,
+        query
+      )
 
       const clinicPromises = clinics.map(
         ({ address, specialtyId, ...clinic }) => {
@@ -154,12 +165,20 @@ export class InitService {
   async createHospitalData() {
     const query = { limit: 1, offset: 0 }
     try {
-      const [country, state, city, specialty] = await Promise.all([
+      const [country, specialty] = await Promise.all([
         this.countryService.findAll(query),
-        this.stateService.findAll(query),
-        this.cityService.findAll(query),
         this.specialtyService.findAll(query)
       ])
+
+      const state = await this.stateService.findAllByCountryId(
+        country.data[0].id,
+        query
+      )
+
+      const city = await this.cityService.findAllByStateId(
+        state.data[0].id,
+        query
+      )
 
       const hospitalPromises = hospitals.map(
         ({ address, specialtyId, ...hospital }) => {

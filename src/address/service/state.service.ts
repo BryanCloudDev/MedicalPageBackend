@@ -63,12 +63,15 @@ export class StateService {
     }
   }
 
-  async findAll(
-    paginationDto?: PaginationDto
+  async findAllByCountryId(
+    countryId: string,
+    paginationDto: PaginationDto
   ): Promise<PaginatedResponse<State> | GenericResponse<State[]>> {
     const { limit, offset } = paginationDto
 
     try {
+      await this.countryService.findById(countryId)
+
       if (limit || offset) {
         const take = limit || this.take
         const skip = offset || this.skip
@@ -76,7 +79,8 @@ export class StateService {
         const response = await pagination<State>({
           repository: this.stateRepository,
           skip,
-          take
+          take,
+          condition: { country: { id: countryId } }
         })
 
         return response
@@ -84,7 +88,8 @@ export class StateService {
 
       const states = await this.stateRepository.find({
         where: {
-          deletedOn: null
+          deletedOn: null,
+          country: { id: countryId }
         }
       })
 
@@ -125,15 +130,5 @@ export class StateService {
     if (!state) {
       throw new NotFoundException(`The state with id ${id} was not found`)
     }
-  }
-
-  private trasformResponse(states: State[]) {
-    return states
-      .filter((state) => state.deletedOn === null)
-      .map((state) => {
-        delete state.deletedOn
-
-        return state
-      })
   }
 }

@@ -51,18 +51,21 @@ export class CityController {
     this.cityService.create(createCityDto)
   }
 
-  @Get()
+  @Get('state/:stateId')
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
     type: CityResponseAll
   })
   @ApiOperation({
-    summary: 'Find all cities'
+    summary: 'Find all cities by state id'
   })
   @ApiExtraModels(PaginationDto)
-  findAll(@Query() query: PaginationDto) {
-    return this.cityService.findAll(query)
+  findAllByStateId(
+    @Param('stateId') stateId: string,
+    @Query() query: PaginationDto
+  ) {
+    return this.cityService.findAllByStateId(stateId, query)
   }
 
   @Get(':id')
