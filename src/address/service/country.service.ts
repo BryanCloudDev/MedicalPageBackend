@@ -60,6 +60,23 @@ export class CountryService {
     }
   }
 
+  async findCountryWithRelations(
+    countryId: string,
+    stateId: string,
+    cityId: string
+  ): Promise<Country> {
+    const country = await this.countryRepository.findOne({
+      where: {
+        deletedOn: null,
+        id: countryId,
+        states: { id: stateId, cities: { id: cityId } }
+      },
+      relations: ['states', 'states.cities']
+    })
+
+    return country
+  }
+
   async findAll(
     paginationDto?: PaginationDto
   ): Promise<PaginatedResponse<Country> | GenericResponse<Country[]>> {

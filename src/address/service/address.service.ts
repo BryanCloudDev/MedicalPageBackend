@@ -45,17 +45,27 @@ export class AddressService {
       const statePromise = this.stateService.findById(stateId)
       const cityPromise = this.cityService.findById(cityId)
 
-      const [country, state, city] = await Promise.all([
-        countryPromise,
-        statePromise,
-        cityPromise
-      ])
+      // Check if id's provided are valid
+      await Promise.all([countryPromise, statePromise, cityPromise])
+
+      // Get the country with its relations and check that the state and city exist in the country
+      const country = await this.countryService.findCountryWithRelations(
+        countryId,
+        stateId,
+        cityId
+      )
+
+      if (!country) {
+        throw new BadRequestException(
+          `The state with id ${stateId} or city with id ${cityId} was not found in the country with id ${countryId}, check that the city belongs to the state and the state belongs to the country`
+        )
+      }
 
       const addressInstance = this.addressRepository.create({
         ...partialAddress,
         country,
-        state,
-        city
+        state: country.states[0],
+        city: country.states[0].cities[0]
       })
 
       const address = await this.addressRepository.save(addressInstance)
