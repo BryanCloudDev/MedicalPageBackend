@@ -27,7 +27,10 @@ export class AdministratorService {
     try {
       if (!file) throw new BadRequestException('File is required')
 
-      const photo = await this.fileService.uploadFile(FolderType.PATIENT, file)
+      const photo = await this.fileService.uploadFile(
+        FolderType.ADMINISTRATOR,
+        file
+      )
 
       await this.userService.updateById(id, {
         photo

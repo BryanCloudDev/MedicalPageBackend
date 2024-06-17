@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import Changelog from 'generate-changelog'
-import { config, fileName } from '../config.js'
-import { selectGitTag } from '../inquirier/selectGitTag.js'
+import { config, fileName } from '../config'
+import { selectGitTag } from '../inquirier/selectGitTag'
 
 const generateChangeLog = async () => {
   const changelogText = await Changelog.generate(config)

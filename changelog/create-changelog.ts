@@ -1,8 +1,8 @@
 import {
   generateChangeLog,
   generateChangeLogByTag
-} from './helpers/createChangelog.js'
-import { generationTypeInquirier } from './inquirier/index.js'
+} from './helpers/createChangelog'
+import { generationTypeInquirier } from './inquirier/index'
 
 export const createChangelog = async () => {
   try {

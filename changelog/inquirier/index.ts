@@ -1,2 +1,2 @@
-export * from './generationType.js'
-export * from './selectGitTag.js'
+export * from './generationType'
+export * from './selectGitTag'
