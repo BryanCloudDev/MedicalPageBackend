@@ -5,6 +5,10 @@ export const config = new DocumentBuilder()
   .setDescription('This is the documentation for the Red Medica Application')
   .setVersion('0.0.1')
   .addServer('http://localhost:3000/', 'Local environment')
+  .addServer(
+    'https://medicalpagebackend-development.up.railway.app/',
+    'Development environment'
+  )
   .setContact(
     'Bryan Portillo',
     'https://bryancloud.dev/',
