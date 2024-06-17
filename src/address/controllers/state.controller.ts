@@ -51,20 +51,22 @@ export class StateController {
     this.stateService.create(createCountryCodeDto)
   }
 
-  @Get()
+  @Get('country/:countryId')
   @GenericResponses()
   @ApiOkResponse({
     description: 'Success',
     type: StateResponseAll
   })
   @ApiOperation({
-    summary: 'Find all states'
+    summary: 'Find all states by country id'
   })
   @ApiExtraModels(PaginationDto)
-  findAll(@Query() query: PaginationDto) {
-    return this.stateService.findAll(query)
+  findAllByCountryId(
+    @Param('countryId') countryId: string,
+    @Query() query: PaginationDto
+  ) {
+    return this.stateService.findAllByCountryId(countryId, query)
   }
-
   @Get(':id')
   @GenericResponses()
   @ApiNotFoundResponse({
