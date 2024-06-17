@@ -13,6 +13,7 @@ import { Repository } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
 import { DoctorService } from 'src/doctor/doctor.service'
 import { exceptionHandler, currentDate } from 'src/common/utils'
+import { Status, statusTransitions } from './enums/status-appoinment.enum'
 
 @Injectable()
 export class AppointmentService {
@@ -46,14 +47,29 @@ export class AppointmentService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
+  async findAll({ patient, doctor }: User) {
     try {
-      const appointments = await this.appointmentRepository.find({
-        skip,
-        take
-      })
+      if (patient) {
+        const { id } = patient
+        const appointments = await this.appointmentRepository.find({
+          where: { patient: { id } }
+        })
 
-      return deleted ? appointments : this.trasformResponse(appointments)
+        return appointments
+      }
+
+      if (doctor) {
+        const { id } = doctor
+        const appointments = await this.appointmentRepository.find({
+          where: { doctor: { id } }
+        })
+
+        return appointments
+      }
+
+      const appointments = await this.appointmentRepository.find()
+
+      return appointments
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -77,13 +93,86 @@ export class AppointmentService {
     }
   }
 
-  async updateById(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+  private async cancelAppointment(id: string, user: User, statusNotes: string) {
+    if (!statusNotes) {
+      throw new BadRequestException('Reason for cancelling is required.')
+    }
+
+    await this.appointmentRepository.update(id, {
+      status: Status.CANCELLED,
+      cancelledBy: user.role,
+      statusNotes
+    })
+  }
+
+  private async completeAppointment(id: string, notes: string) {
+    if (!notes) {
+      throw new BadRequestException('Notes are required')
+    }
+    await this.appointmentRepository.update(id, {
+      status: Status.COMPLETED,
+      notes,
+      statusNotes: 'Appointment completed'
+    })
+  }
+
+  private async notAttendedAppointment(id: string) {
+    await this.appointmentRepository.update(id, {
+      status: Status.NOT_ATTENDED,
+      statusNotes: 'Patient did not attend the appointment'
+    })
+  }
+
+  async updateById(
+    id: string,
+    user: User,
+    { status, statusNotes, appointmentDate, notes }: UpdateAppointmentDto
+  ) {
     try {
-      delete updateAppointmentDto.doctorId
+      // get current status to see if it can be changed to the new status
+      const { status: currentStatus } = await this.findById(id)
 
-      await this.findById(id)
+      const allowedTransitions = statusTransitions[currentStatus]
 
-      await this.appointmentRepository.update(id, updateAppointmentDto)
+      if (!allowedTransitions.includes(status)) {
+        throw new BadRequestException(
+          `Status can not be changed from ${currentStatus} to ${status}`
+        )
+      }
+
+      if (user.patient) {
+        if (status === Status.CANCELLED) {
+          await this.cancelAppointment(id, user, statusNotes)
+          return
+        }
+        throw new BadRequestException(
+          'Patients can only cancel the appointment, not update it'
+        )
+      }
+
+      if (user.doctor) {
+        if (status === Status.CANCELLED) {
+          await this.cancelAppointment(id, user, statusNotes)
+          return
+        }
+
+        if (status === Status.COMPLETED) {
+          await this.completeAppointment(id, notes)
+          return
+        }
+
+        if (status === Status.NOT_ATTENDED) {
+          await this.notAttendedAppointment(id)
+          return
+        }
+      }
+
+      await this.appointmentRepository.update(id, {
+        status,
+        statusNotes,
+        appointmentDate,
+        notes
+      })
     } catch (error) {
       exceptionHandler(this.logger, error)
     }

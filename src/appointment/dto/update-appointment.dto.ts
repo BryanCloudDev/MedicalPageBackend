@@ -1,5 +1,5 @@
 import { CreateAppointmentDto } from './create-appointment.dto'
-import { IsEnum } from 'class-validator'
+import { IsEnum, IsOptional, IsString } from 'class-validator'
 import { Status } from '../enums/status-appoinment.enum'
 import { ApiProperty, PartialType } from '@nestjs/swagger'
 
@@ -11,4 +11,12 @@ export class UpdateAppointmentDto extends PartialType(CreateAppointmentDto) {
   })
   @IsEnum(Status)
   status?: Status
+
+  @ApiProperty({
+    example: 'I will not make it to the appointment',
+    description: 'Reason for cancelling appointment'
+  })
+  @IsString()
+  @IsOptional()
+  statusNotes?: string
 }
