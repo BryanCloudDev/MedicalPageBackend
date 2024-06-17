@@ -135,16 +135,6 @@ export class CountryService {
     }
   }
 
-  private trasformResponse(countries: Country[]) {
-    return countries
-      .filter((country) => country.deletedOn === null)
-      .map((country) => {
-        delete country.deletedOn
-
-        return country
-      })
-  }
-
   private checkIfCountryExists(id: string, country: Country | undefined) {
     if (!country) {
       throw new NotFoundException(`The country with id ${id} was not found`)
