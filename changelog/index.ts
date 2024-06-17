@@ -1,6 +1,6 @@
 import inquirer from 'inquirer'
-import { createChangelog } from './create-changelog.js'
-import { createChangelogCommit } from './create-changelog-commit.js'
+import { createChangelog } from './create-changelog'
+import { createChangelogCommit } from './create-changelog-commit'
 
 const main = async () => {
   const answers = await inquirer.prompt([

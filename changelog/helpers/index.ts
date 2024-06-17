@@ -1,2 +1,2 @@
-export * from './getGitTags.js'
-export * from './createChangelog.js'
+export * from './getGitTags'
+export * from './createChangelog'

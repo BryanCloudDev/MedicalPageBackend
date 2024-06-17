@@ -1,4 +1,5 @@
 export enum FolderType {
   DOCTOR = 'doctors',
-  PATIENT = 'patients'
+  PATIENT = 'patients',
+  ADMINISTRATOR = 'administrators'
 }

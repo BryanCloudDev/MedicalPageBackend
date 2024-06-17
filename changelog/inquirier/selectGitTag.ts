@@ -1,5 +1,5 @@
 import inquirer from 'inquirer'
-import { getGitTags } from '../helpers/index.js'
+import { getGitTags } from '../helpers/index'
 
 const selectGitTag = async () => {
   const answer = await inquirer.prompt({
