@@ -44,12 +44,13 @@ export class DoctorService {
     specialty: Specialty,
     createDoctorDto: CreateDoctorDto
   ) {
-    const { jvpmNumber, officePhoneNumber } = createDoctorDto
+    const { jvpmNumber, officePhoneNumber, schedule } = createDoctorDto
     try {
       const doctorInstance = this.doctorRepository.create({
         user,
         jvpmNumber,
         specialty,
+        schedule,
         officePhoneNumber
       })
 

@@ -56,11 +56,11 @@ export class AppointmentController {
   })
   @ApiOperation({
     summary: 'Find all appointments',
-    description: Description.administrator
+    description: Description.getAdministratorPatientAndDoctor()
   })
-  @Auth(Roles.ADMINISTRATOR)
-  findAll() {
-    return this.appointmentService.findAll()
+  @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR, Roles.PATIENT)
+  findAll(@GetUser() user: User) {
+    return this.appointmentService.findAll(user)
   }
 
   @Get(':id')
@@ -96,9 +96,10 @@ export class AppointmentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   updateById(
     @Param('id') id: string,
+    @GetUser() user: User,
     @Body() updateAppointmentDto: UpdateAppointmentDto
   ) {
-    return this.appointmentService.updateById(id, updateAppointmentDto)
+    return this.appointmentService.updateById(id, user, updateAppointmentDto)
   }
 
   @Delete(':id')

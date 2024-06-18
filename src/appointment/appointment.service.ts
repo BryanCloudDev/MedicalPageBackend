@@ -4,15 +4,19 @@ import {
   Logger,
   NotFoundException
 } from '@nestjs/common'
-import { CreateAppointmentDto } from './dto/create-appointment.dto'
-import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { User } from 'src/user/entities/user.entity'
-import { Appointment } from './entities/appointment.entity'
+import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { ConfigService } from '@nestjs/config'
-import { DoctorService } from 'src/doctor/doctor.service'
+import * as moment from 'moment'
+import { Status, statusTransitions } from './enums/status-appoinment.enum'
+import { CreateAppointmentDto } from './dto/create-appointment.dto'
+import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import { exceptionHandler, currentDate } from 'src/common/utils'
+import { Appointment } from './entities/appointment.entity'
+import { Doctor } from 'src/doctor/entities/doctor.entity'
+import { DoctorService } from 'src/doctor/doctor.service'
+import { User } from 'src/user/entities/user.entity'
+import { TimeSlot } from 'src/common/interfaces'
 
 @Injectable()
 export class AppointmentService {
@@ -27,15 +31,17 @@ export class AppointmentService {
   private readonly take = this.configService.get('ENTITIES_LIMIT')
   private readonly skip = this.configService.get('ENTITIES_SKIP')
 
-  async create(createAppointmentDto: CreateAppointmentDto, user: User) {
+  async create(
+    { appointmentDate, doctorId }: CreateAppointmentDto,
+    { patient }: User
+  ) {
     try {
-      const { patient } = user
-      const { doctor } = await this.doctorService.findById(
-        createAppointmentDto.doctorId
-      )
+      const { doctor } = await this.doctorService.findById(doctorId)
+
+      await this.checkIfDoctorHasAppointment(doctor, appointmentDate)
 
       const appointmentInstance = this.appointmentRepository.create({
-        ...createAppointmentDto,
+        appointmentDate,
         patient,
         doctor
       })
@@ -46,14 +52,29 @@ export class AppointmentService {
     }
   }
 
-  async findAll(skip = this.skip, take = this.take, deleted = false) {
+  async findAll({ patient, doctor }: User) {
     try {
-      const appointments = await this.appointmentRepository.find({
-        skip,
-        take
-      })
+      if (patient) {
+        const { id } = patient
+        const appointments = await this.appointmentRepository.find({
+          where: { patient: { id } }
+        })
 
-      return deleted ? appointments : this.trasformResponse(appointments)
+        return appointments
+      }
+
+      if (doctor) {
+        const { id } = doctor
+        const appointments = await this.appointmentRepository.find({
+          where: { doctor: { id } }
+        })
+
+        return appointments
+      }
+
+      const appointments = await this.appointmentRepository.find()
+
+      return appointments
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -77,13 +98,56 @@ export class AppointmentService {
     }
   }
 
-  async updateById(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+  async updateById(
+    id: string,
+    user: User,
+    { status, statusNotes, appointmentDate, notes }: UpdateAppointmentDto
+  ) {
     try {
-      delete updateAppointmentDto.doctorId
+      // get current status to see if it can be changed to the new status
+      const { status: currentStatus } = await this.findById(id)
 
-      await this.findById(id)
+      const allowedTransitions = statusTransitions[currentStatus]
 
-      await this.appointmentRepository.update(id, updateAppointmentDto)
+      if (!allowedTransitions.includes(status)) {
+        throw new BadRequestException(
+          `Status can not be changed from ${currentStatus} to ${status}`
+        )
+      }
+
+      if (user.patient) {
+        if (status === Status.CANCELLED) {
+          await this.cancelAppointment(id, user, statusNotes)
+          return
+        }
+        throw new BadRequestException(
+          'Patients can only cancel the appointment, not update it'
+        )
+      }
+
+      if (user.doctor) {
+        if (status === Status.CANCELLED) {
+          await this.cancelAppointment(id, user, statusNotes)
+          return
+        }
+
+        if (status === Status.COMPLETED) {
+          await this.completeAppointment(id, notes)
+          return
+        }
+
+        if (status === Status.NOT_ATTENDED) {
+          await this.notAttendedAppointment(id)
+          return
+        }
+      }
+
+      await this.appointmentRepository.update(id, {
+        status,
+        statusNotes,
+        appointmentDate,
+        notes
+      })
     } catch (error) {
       exceptionHandler(this.logger, error)
     }
@@ -110,13 +174,81 @@ export class AppointmentService {
     }
   }
 
-  private trasformResponse(appointments: Appointment[]) {
-    return appointments
-      .filter((appointment) => appointment.deletedOn === null)
-      .map((appointment) => {
-        delete appointment.deletedOn
+  private async cancelAppointment(id: string, user: User, statusNotes: string) {
+    if (!statusNotes) {
+      throw new BadRequestException('Reason for cancelling is required.')
+    }
 
-        return appointment
-      })
+    await this.appointmentRepository.update(id, {
+      status: Status.CANCELLED,
+      cancelledBy: user.role,
+      statusNotes
+    })
+  }
+
+  private async completeAppointment(id: string, notes: string) {
+    if (!notes) {
+      throw new BadRequestException('Notes are required')
+    }
+    await this.appointmentRepository.update(id, {
+      status: Status.COMPLETED,
+      notes,
+      statusNotes: 'Appointment completed'
+    })
+  }
+
+  private async notAttendedAppointment(id: string) {
+    await this.appointmentRepository.update(id, {
+      status: Status.NOT_ATTENDED,
+      statusNotes: 'Patient did not attend the appointment'
+    })
+  }
+
+  private async checkIfDoctorHasAppointment(
+    { schedule, id }: Doctor,
+    appointmentDate: Date
+  ) {
+    const dayString = moment(appointmentDate).format('dddd').toLowerCase()
+
+    // check if the doctor works on the selected day
+    const scheduleForDoctor = schedule[dayString]
+
+    if (scheduleForDoctor.length === 0) {
+      throw new BadRequestException(`The doctor does not work on ${dayString}`)
+    }
+    // check if the doctor works at the selected time
+    const isWithinRange = this.isWithinRange(
+      appointmentDate,
+      scheduleForDoctor[0]
+    )
+
+    if (!isWithinRange) {
+      throw new BadRequestException(
+        `The doctor does not work at the selected time`
+      )
+    }
+
+    const foundAppointment = await this.appointmentRepository.findOne({
+      where: {
+        doctor: { id },
+        appointmentDate,
+        status: Status.CREATED
+      }
+    })
+
+    if (foundAppointment) {
+      throw new BadRequestException(
+        `An appointment exists at the selected time`
+      )
+    }
+  }
+
+  private isWithinRange(date: Date, range: TimeSlot) {
+    const time = moment(date).format('HH:mm')
+    const startTime = moment(range.start, 'HH:mm')
+    const endTime = moment(range.end, 'HH:mm')
+    const currentTime = moment(time, 'HH:mm')
+
+    return currentTime.isBetween(startTime, endTime, null, '[)')
   }
 }

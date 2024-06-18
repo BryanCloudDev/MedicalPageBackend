@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsDate, IsOptional, IsString, IsUUID } from 'class-validator'
+import { NotBeforeThan } from 'src/common/decorators'
 
 export class CreateAppointmentDto {
   @ApiProperty({
@@ -9,6 +10,7 @@ export class CreateAppointmentDto {
     description: 'Appointment date'
   })
   @IsDate()
+  @NotBeforeThan()
   @Type(() => Date)
   appointmentDate: Date
 

@@ -24,6 +24,16 @@ export class Appointment extends BaseEntity {
   })
   doctor: Doctor
 
+  @Column('varchar', {
+    nullable: true
+  })
+  cancelledBy?: string
+
+  @Column('text', {
+    nullable: true
+  })
+  statusNotes?: string
+
   @ManyToOne(() => Patient, (patient) => patient.appointments, {
     nullable: false
   })
