@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { UserResponse } from './user.class'
+import { CreateScheduleDto } from 'src/common/dtos/schedule.dto'
 
 class DoctorUserResponse {
   @ApiProperty({
@@ -38,6 +39,9 @@ class DoctorUserResponse {
     type: Date
   })
   startDateSponsor: Date
+
+  @ApiProperty({ type: CreateScheduleDto, description: 'Schedule' })
+  schedule: CreateScheduleDto
 }
 
 export class DoctorResponse extends UserResponse {

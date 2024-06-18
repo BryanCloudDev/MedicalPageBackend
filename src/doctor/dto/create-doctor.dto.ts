@@ -1,6 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumberString, IsString, IsUUID, Length } from 'class-validator'
+import { Type } from 'class-transformer'
+import {
+  IsNotEmptyObject,
+  IsNumberString,
+  IsString,
+  IsUUID,
+  Length,
+  ValidateNested
+} from 'class-validator'
 import { IsValidPhoneNumber } from 'src/common/decorators'
+import { CreateScheduleDto } from 'src/common/dtos/schedule.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 
 export class CreateDoctorDto extends CreateUserDto {
@@ -28,4 +37,10 @@ export class CreateDoctorDto extends CreateUserDto {
   @IsString()
   @IsValidPhoneNumber()
   officePhoneNumber: string
+
+  @ApiProperty({ type: CreateScheduleDto, description: 'Schedule' })
+  @ValidateNested({ each: true })
+  @Type(() => CreateScheduleDto)
+  @IsNotEmptyObject()
+  schedule: CreateScheduleDto
 }

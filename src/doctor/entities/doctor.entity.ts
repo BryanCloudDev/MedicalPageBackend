@@ -14,6 +14,7 @@ import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { Review } from 'src/review/entities/review.entity'
 import { User } from 'src/user/entities/user.entity'
 import { BaseEntity } from 'src/common/entities'
+import { Schedule } from 'src/common/interfaces'
 
 @Entity({ name: 'doctors' })
 export class Doctor extends BaseEntity {
@@ -40,6 +41,11 @@ export class Doctor extends BaseEntity {
   })
   @JoinColumn()
   user: User
+
+  @Column({
+    type: 'json'
+  })
+  schedule: Schedule
 
   @OneToMany(() => Appointment, (appointment) => appointment.doctor)
   appointments?: Appointment[]
