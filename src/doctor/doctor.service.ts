@@ -90,6 +90,7 @@ export class DoctorService {
 
   getDoctorProfile(user: User) {
     delete user.patient
+    delete user.administrator
 
     return user
   }

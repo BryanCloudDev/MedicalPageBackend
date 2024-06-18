@@ -80,16 +80,11 @@ export class User extends BaseEntity {
   })
   administrator: Administrator
 
-  @OneToOne(() => Address, (address) => address.user, {
-    // nullable: false,
-    eager: true
-  })
+  @OneToOne(() => Address, (address) => address.user)
   @JoinColumn()
   address: Address
 
-  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.user, {
-    eager: true
-  })
+  @ManyToOne(() => PhoneCode, (phoneCode) => phoneCode.user)
   regionNumber?: PhoneCode
 
   private encrpytPassword() {

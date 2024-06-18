@@ -74,6 +74,12 @@ export class CountryService {
       relations: ['states', 'states.cities']
     })
 
+    if (!country) {
+      throw new BadRequestException(
+        `The country with id ${countryId} does not have the state with id ${stateId} and city with id ${cityId}`
+      )
+    }
+
     return country
   }
 

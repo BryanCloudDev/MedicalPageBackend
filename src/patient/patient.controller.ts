@@ -104,7 +104,7 @@ export class PatientController {
     description: Description.getAdministratorAndDoctor()
   })
   @Auth(Roles.ADMINISTRATOR, Roles.DOCTOR)
-  findOne(@Param('id') id: string) {
+  findById(@Param('id') id: string) {
     return this.patientService.findById(id)
   }
 
