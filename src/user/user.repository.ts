@@ -1,11 +1,11 @@
-import { Repository } from 'typeorm'
-import { User } from './entities/user.entity'
 import { Injectable } from '@nestjs/common'
+import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PhoneCode } from 'src/address/entities/phone-code.entity'
-import { Roles } from './enums'
 import { Address } from 'src/address/entities/address.entity'
 import { currentDate } from 'src/common/utils'
+import { User } from './entities/user.entity'
+import { Roles } from './enums'
 
 @Injectable()
 export class UserRepository {
@@ -76,7 +76,8 @@ export class UserRepository {
         'regionNumber',
         'patient',
         'doctor',
-        'administrator'
+        'administrator',
+        'doctor.specialty'
       ]
     })
 
