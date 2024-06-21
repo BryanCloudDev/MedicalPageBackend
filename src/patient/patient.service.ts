@@ -1,7 +1,6 @@
-import { Repository } from 'typeorm'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
 import { UpdatePatientDto } from './dto/update-patient.dto'
+import { PatientRepository } from './patient.repository'
 import { FolderType } from 'src/file/enums/folder.enum'
 import { User } from 'src/user/entities/user.entity'
 import { Patient } from './entities/patient.entity'
@@ -14,15 +13,14 @@ import { Roles } from 'src/user/enums'
 @Injectable()
 export class PatientService {
   constructor(
-    @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>,
+    private readonly patientRepository: PatientRepository,
     private readonly userService: UserService,
     private readonly fileService: FileService
   ) {}
 
   private readonly logger = new Logger(PatientService.name)
 
-  async uploadPhoto(file: Express.Multer.File, user: User) {
+  async uploadPhoto(file: Express.Multer.File, user: User): Promise<void> {
     const { id } = user
     try {
       if (!file) throw new BadRequestException('File is required')
@@ -37,10 +35,9 @@ export class PatientService {
     }
   }
 
-  async create(user: User) {
+  async create(user: User): Promise<Patient> {
     try {
-      const patientInstance = this.patientRepository.create({ user })
-      const patient = await this.patientRepository.save(patientInstance)
+      const patient = this.patientRepository.create(user)
 
       return patient
     } catch (error) {
@@ -48,7 +45,7 @@ export class PatientService {
     }
   }
 
-  async findAll(filterDto: PaginationUserDto) {
+  async findAll(filterDto: PaginationUserDto): Promise<User[]> {
     try {
       const { offset, limit } = filterDto
 
@@ -64,7 +61,7 @@ export class PatientService {
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<User> {
     try {
       const patient = await this.userService.findById(id)
 
@@ -74,17 +71,21 @@ export class PatientService {
     }
   }
 
-  getPatientProfile(user: User) {
+  getPatientProfile(user: User): User {
     delete user.doctor
+    delete user.administrator
 
     return user
   }
 
-  async updateById(id: string, updatePatientDto: UpdatePatientDto) {
+  async updateById(
+    id: string,
+    updatePatientDto: UpdatePatientDto
+  ): Promise<void> {
     await this.userService.updateById(id, updatePatientDto)
   }
 
-  async deleteById(id: string) {
+  async deleteById(id: string): Promise<void> {
     try {
       await this.userService.deleteById(id)
     } catch (error) {

@@ -42,9 +42,7 @@ export class Doctor extends BaseEntity {
   @JoinColumn()
   user: User
 
-  @Column({
-    type: 'json'
-  })
+  @Column('json')
   schedule: Schedule
 
   @OneToMany(() => Appointment, (appointment) => appointment.doctor)

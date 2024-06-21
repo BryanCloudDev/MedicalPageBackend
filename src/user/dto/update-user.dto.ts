@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsDate, IsString, Length } from 'class-validator'
+import {
+  IsDate,
+  IsNotEmptyObject,
+  IsString,
+  Length,
+  ValidateNested
+} from 'class-validator'
+import { CreateAddressDto } from 'src/address/dto/address/create-address.dto'
 import { IsLaterThan, IsValidPhoneNumber } from 'src/common/decorators'
 
 export class UpdateUserDto {
@@ -41,6 +48,12 @@ export class UpdateUserDto {
   @IsLaterThan()
   @Type(() => Date)
   birthDate?: Date
+
+  @ApiProperty({ type: CreateAddressDto, description: 'User address' })
+  @ValidateNested({ each: true })
+  @Type(() => CreateAddressDto)
+  @IsNotEmptyObject()
+  address?: CreateAddressDto
 
   photo?: string
 

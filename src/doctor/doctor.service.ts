@@ -1,30 +1,30 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { Specialty } from 'src/specialty/entities/specialty.entity'
+import { SpecialtyService } from 'src/specialty/specialty.service'
 import { CreateDoctorDto } from './dto/create-doctor.dto'
 import { UpdateDoctorDto } from './dto/update-doctor.dto'
-import { Doctor } from './entities/doctor.entity'
-import { Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
-import { exceptionHandler } from 'src/common/utils'
-import { User } from 'src/user/entities/user.entity'
-import { Specialty } from 'src/specialty/entities/specialty.entity'
 import { FolderType } from 'src/file/enums/folder.enum'
+import { DoctorRepository } from './doctor.repository'
+import { User } from 'src/user/entities/user.entity'
+import { exceptionHandler } from 'src/common/utils'
 import { FileService } from 'src/file/file.service'
 import { UserService } from 'src/user/user.service'
 import { PaginationUserDto } from 'src/patient/dto'
+import { Doctor } from './entities/doctor.entity'
 import { Roles } from 'src/user/enums'
 
 @Injectable()
 export class DoctorService {
   constructor(
-    @InjectRepository(Doctor)
-    private readonly doctorRepository: Repository<Doctor>,
+    private readonly doctorRepository: DoctorRepository,
+    private readonly specialtyService: SpecialtyService,
     private readonly userService: UserService,
     private readonly fileService: FileService
   ) {}
 
   private readonly logger = new Logger(DoctorService.name)
 
-  async uploadPhoto(file: Express.Multer.File, user: User) {
+  async uploadPhoto(file: Express.Multer.File, user: User): Promise<void> {
     const { id } = user
     try {
       if (!file) throw new BadRequestException('File is required')
@@ -43,18 +43,13 @@ export class DoctorService {
     user: User,
     specialty: Specialty,
     createDoctorDto: CreateDoctorDto
-  ) {
-    const { jvpmNumber, officePhoneNumber, schedule } = createDoctorDto
+  ): Promise<Doctor> {
     try {
-      const doctorInstance = this.doctorRepository.create({
+      const doctor = this.doctorRepository.create(
         user,
-        jvpmNumber,
         specialty,
-        schedule,
-        officePhoneNumber
-      })
-
-      const doctor = await this.doctorRepository.save(doctorInstance)
+        createDoctorDto
+      )
 
       return doctor
     } catch (error) {
@@ -62,7 +57,7 @@ export class DoctorService {
     }
   }
 
-  async findAll(filterDto: PaginationUserDto) {
+  async findAll(filterDto: PaginationUserDto): Promise<User[]> {
     try {
       const { offset, limit } = filterDto
 
@@ -78,7 +73,7 @@ export class DoctorService {
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<User> {
     try {
       const doctor = await this.userService.findById(id)
 
@@ -88,17 +83,43 @@ export class DoctorService {
     }
   }
 
-  getDoctorProfile(user: User) {
+  getDoctorProfile(user: User): User {
     delete user.patient
+    delete user.administrator
 
     return user
   }
 
-  async updateById(id: string, updateDoctorDto: UpdateDoctorDto) {
-    await this.userService.updateById(id, updateDoctorDto)
+  async updateById(
+    id: string,
+    {
+      specialtyId,
+      officePhoneNumber,
+      jvpmNumber,
+      schedule,
+      ...partialUpdateDoctorDto
+    }: UpdateDoctorDto
+  ): Promise<void> {
+    try {
+      const [{ doctor }, specialty] = await Promise.all([
+        this.findById(id),
+        this.specialtyService.findById(specialtyId)
+      ])
+
+      await this.userService.updateById(id, partialUpdateDoctorDto)
+
+      await this.doctorRepository.updateByEntity(doctor, {
+        officePhoneNumber,
+        specialty,
+        jvpmNumber,
+        schedule
+      })
+    } catch (error) {
+      exceptionHandler(this.logger, error)
+    }
   }
 
-  async deleteById(id: string) {
+  async deleteById(id: string): Promise<void> {
     try {
       await this.userService.deleteById(id)
     } catch (error) {

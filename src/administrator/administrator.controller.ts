@@ -11,9 +11,6 @@ import {
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
-import { AdministratorService } from './administrator.service'
-
-import { UpdateAdministratorDto } from './dto/update-administrator.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import {
   ApiTags,
@@ -24,13 +21,15 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse
 } from '@nestjs/swagger'
-import { Auth, GetUser } from 'src/auth/decorators'
-import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
-import { PaginationDto } from 'src/common/dtos'
 import { AdministratorResponse } from 'src/common/swagger/classes/administrator.class'
+import { GenericResponses } from 'src/common/decorators/genericResponses.decorator'
+import { UpdateAdministratorDto } from './dto/update-administrator.dto'
 import { Description } from 'src/common/swagger/description.swagger'
-import { fileFilter } from 'src/common/utils'
+import { AdministratorService } from './administrator.service'
 import { User } from 'src/user/entities/user.entity'
+import { Auth, GetUser } from 'src/auth/decorators'
+import { PaginationDto } from 'src/common/dtos'
+import { fileFilter } from 'src/common/utils'
 import { Roles } from 'src/user/enums'
 
 @ApiTags('Administrator')
