@@ -63,20 +63,17 @@ export class User extends BaseEntity {
   isActive: boolean
 
   @OneToOne(() => Patient, (patient) => patient.user, {
-    nullable: false,
-    eager: true
+    nullable: false
   })
   patient: Patient
 
   @OneToOne(() => Doctor, (doctor) => doctor.user, {
-    nullable: false,
-    eager: true
+    nullable: false
   })
   doctor: Doctor
 
   @OneToOne(() => Administrator, (administrator) => administrator.user, {
-    nullable: false,
-    eager: true
+    nullable: false
   })
   administrator: Administrator
 
