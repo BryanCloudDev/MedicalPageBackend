@@ -39,6 +39,7 @@
     "joi": "^17.11.0",
     "moment": "^2.29.4",
     "mysql2": "^3.9.7",
+    "nodemailer": "^6.9.14",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
